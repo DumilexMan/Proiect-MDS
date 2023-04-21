@@ -179,12 +179,14 @@ def posts_ownded_by_user():
 @app.route('/posts')
 def posts():
     posts = Post.query.all()
-    post_list = []
-    for post in posts:
-        post_dict = post.__dict__
-        del post_dict['_sa_instance_state']
-        post_list.append(post_dict)
-    return jsonify(post_list)
+    # post_list = []
+    # for post in posts:
+    #     post_dict = post.__dict__
+    #     del post_dict['_sa_instance_state']
+    #     post_list.append(post_dict)
+    # return jsonify(post_list)
+    return render_template('posts.html', posts=posts)
+
 
 
 @app.route('/posts/<int:post_id>', methods=['GET'])
@@ -193,45 +195,47 @@ def get_post(post_id):
     post = Post.query.get_or_404(post_id)
 
     # Return a JSON response with the post details
-    return jsonify({
-        'id': post.id_post,
-        'title': post.title,
-        'description': post.description,
-        'price': post.price,
-        'product_id': post.id_product,
-        'status': post.status,
-        'start_date': post.start_date,
-        'end_date': post.end_date,
-        'id_user': post.id_user
-    }), 200
+    # return jsonify({
+    #     'id': post.id_post,
+    #     'title': post.title,
+    #     'description': post.description,
+    #     'price': post.price,
+    #     'product_id': post.id_product,
+    #     'status': post.status,
+    #     'start_date': post.start_date,
+    #     'end_date': post.end_date,
+    #     'id_user': post.id_user
+    # }), 200
+    return render_template('post.html', post=post)
 
 
-@app.route('/posts/<int:id_post>/buy', methods=['POST'])
+# de adaugat in HTML : <a href="{{ url_for('buy_product', id_post=post.id) }}" class="btn btn-primary" role="button" method="POST">Buy product</a>
+
+@app.route('/posts/<int:id_post>/buy', methods=['POST','GET'])
 @login_required
 def buy_product(id_post):
-    post = Post.query.get_or_404(id_post)
-    product = Product.query.get_or_404(post.id_product)
-    if post.id_user == current_user.id_user:
-        flash('You cannot buy your own product!', 'warning')
-        return redirect(url_for('get_post', post_id=id_post))
-    elif post.status == 'closed':
-        flash('This product is already sold!', 'warning')
-        return redirect(url_for('get_post', post_id=id_post))
+    if request.method == 'POST':
+        post = Post.query.get_or_404(id_post)
+        product = Product.query.get_or_404(post.id_product)
+        if post.id_user == current_user.id_user:
+            flash('You cannot buy your own product!', 'warning')
+            return redirect(url_for('get_post', post_id=id_post))
+        elif post.status == 'closed':
+            flash('This product is already sold!', 'warning')
+            return redirect(url_for('get_post', post_id=id_post))
+        else:
+            transaction = Transaction(buyer_id=current_user.id_user, seller_id = post.id_user, product_id = post.id_product, price = post.price)
+            db.session.add(transaction)
+            product.id_user = current_user.id_user
+            post.status = "closed"
+            db.session.commit()
+            flash('You have successfully bought the product!', 'success')
+            return redirect(url_for('posts'))
+
+
+        return jsonify({'message': 'Transaction created successfully'}), 201
     else:
-        transaction = Transaction(buyer_id=current_user.id_user, seller_id = post.id_user, product_id = post.id_product, price = post.price)
-        db.session.add(transaction)
-        product.id_user = current_user.id_user
-        db.session.commit()
-        flash('You have successfully bought the product!', 'success')
         return redirect(url_for('get_post', post_id=id_post))
-
-
-    # Update the status of the post to "sold"
-    post = Post.query.get_or_404(post_id)
-    post.status = "closed"
-    db.session.commit()
-
-    return jsonify({'message': 'Transaction created successfully'}), 201
 
 @app.route('/')
 def home():
