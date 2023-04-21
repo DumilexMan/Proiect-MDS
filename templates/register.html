@@ -1,22 +1,27 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-  </head>
-  <body>
-    <h1>Register</h1>
-    <form method="POST" action="{{ url_for('register') }}">
-      <label for="email">Email</label>
-      <input type="email" name="email" required><br><br>
-      <label for="username">Username</label>
-      <input type="text" name="username" required><br><br>
-      <label for="password">Password</label>
-      <input type="password" name="password" required><br><br>
-      <label for="name">Name</label>
-      <input type="text" name="name" required><br><br>
-      <label for="address">Address</label>
-      <input type="text" name="address" required><br><br>
-      <button type="submit">Register</button>
+</head>
+
+<body>
+    <h1>Register Page</h1>
+
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        {{ form.username }}
+        {{ form.password }}
+        {{ form.email }}
+        {{ form.name }}
+        {{ form.address }}
+        {{ form.submit }}
     </form>
-  </body>
+
+    <a href="{{ url_for('login') }}">Already have an account? Log In</a>
+</body>
+
 </html>

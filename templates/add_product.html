@@ -1,0 +1,25 @@
+  <div class="container mt-4">
+    <h1 class="mb-4">Adaugă un produs</h1>
+    <form method="POST" action="{{ url_for('add_product') }}">
+      <div class="form-group">
+        <label for="name">Nume:</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+      </div>
+      <div class="form-group">
+        <label for="price">Preț:</label>
+        <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="category">Categorie:</label>
+        <select class="form-control" id="category" name="category" required>
+          <option value="">-- Selectează o categorie --</option>
+          <option value="electronice">Electronice</option>
+          <option value="imbracaminte">Îmbrăcăminte</option>
+          <option value="jucarii">Jucării</option>
+          <option value="carti">Cărți</option>
+          <option value="altele">Altele</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Adaugă produsul</button>
+    </form>
+  </div>
