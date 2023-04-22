@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, flash,jsonify, session
+# import socketio
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from models import app, db, User, Product, Post, Auction, Transaction
 import hashlib
@@ -9,26 +10,29 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
-
-
+from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, join_room
+from flask_socketio import SocketIO, leave_room
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 bcrypt = Bcrypt()
+socketio = SocketIO(app)
+
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=30)], render_kw={"placeholder": "Username"})
+        InputRequired(), Length(min=4, max=30)], render_kw={"placeholder": "Username"})
 
     password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=40)], render_kw={"placeholder": "Password"})
+        InputRequired(), Length(min=8, max=40)], render_kw={"placeholder": "Password"})
     email = StringField(validators=[
-                           InputRequired(), Length(min=4, max=50)], render_kw={"placeholder": "Email"})
+        InputRequired(), Length(min=4, max=50)], render_kw={"placeholder": "Email"})
     name = StringField(validators=[
-                           InputRequired(), Length(min=4, max=30)], render_kw={"placeholder": "Name"})
+        InputRequired(), Length(min=4, max=30)], render_kw={"placeholder": "Name"})
     address = StringField(validators=[
-                           InputRequired(), Length(min=4, max=100)], render_kw={"placeholder": "Address"})
+        InputRequired(), Length(min=4, max=100)], render_kw={"placeholder": "Address"})
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -41,17 +45,17 @@ class RegisterForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
 
     password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+        InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
 
     submit = SubmitField('Login')
+
 
 @login_manager.user_loader
 def load_user(id_user):
     return User.query.get(int(id_user))
-
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -79,7 +83,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@ app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
 
@@ -106,6 +110,7 @@ def register():
 def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
 
+
 @app.route('/add_product', methods=['GET', 'POST'])
 @login_required
 def add_product():
@@ -118,7 +123,7 @@ def add_product():
             return redirect(url_for('login'))
         else:
             # Crează un obiect de tipul Product cu datele primite prin POST și salvează-l în baza de date
-            product = Product(name=name,price = price, category = category,
+            product = Product(name=name, price=price, category=category,
                               id_user=user.id_user)
             db.session.add(product)
             db.session.commit()
@@ -145,13 +150,14 @@ def create_post():
         if user is None:
             return redirect(url_for('login'))
         else:
-            post = Post(title=title, description=description, id_user= user.id_user, price=price, start_date=start_date, end_date=end_date, id_product=id_product)
+            post = Post(title=title, description=description, id_user=user.id_user, price=price, start_date=start_date,
+                        end_date=end_date, id_product=id_product)
             db.session.add(post)
             db.session.commit()
 
             return redirect(url_for('posts_ownded_by_user'))
     else:
-        return render_template('create_post.html',datetime = datetime)
+        return render_template('create_post.html', datetime=datetime)
 
 
 @app.route('/products')
@@ -163,6 +169,7 @@ def products():
         del product_dict['_sa_instance_state']  # Remove the SQLAlchemy state from the dictionary
         product_list.append(product_dict)
     return jsonify(product_list)
+
 
 @app.route('/posts_ownded_by_user')
 @login_required
@@ -176,42 +183,26 @@ def posts_ownded_by_user():
         post_list.append(post_dict)
     return jsonify(post_list)
 
+
 @app.route('/posts')
 def posts():
     posts = Post.query.all()
-    # post_list = []
-    # for post in posts:
-    #     post_dict = post.__dict__
-    #     del post_dict['_sa_instance_state']
-    #     post_list.append(post_dict)
-    # return jsonify(post_list)
     return render_template('posts.html', posts=posts)
 
 
-
-@app.route('/posts/<int:post_id>', methods=['GET'])
+@app.route('/posts/<int:post_id>', methods=['POST','GET'])
 def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
-
-    # Return a JSON response with the post details
-    # return jsonify({
-    #     'id': post.id_post,
-    #     'title': post.title,
-    #     'description': post.description,
-    #     'price': post.price,
-    #     'product_id': post.id_product,
-    #     'status': post.status,
-    #     'start_date': post.start_date,
-    #     'end_date': post.end_date,
-    #     'id_user': post.id_user
-    # }), 200
+    # if request.method == 'POST':
+    #     message = request.form['message']
+    #     owner_username = request.form['owner_username']
+    #     socketio.emit('direct_message', {'message': message, 'ownerUsername': owner_username})
     return render_template('post.html', post=post)
 
 
-# de adaugat in HTML : <a href="{{ url_for('buy_product', id_post=post.id) }}" class="btn btn-primary" role="button" method="POST">Buy product</a>
 
-@app.route('/posts/<int:id_post>/buy', methods=['POST','GET'])
+@app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
 @login_required
 def buy_product(id_post):
     if request.method == 'POST':
@@ -224,7 +215,8 @@ def buy_product(id_post):
             flash('This product is already sold!', 'warning')
             return redirect(url_for('get_post', post_id=id_post))
         else:
-            transaction = Transaction(buyer_id=current_user.id_user, seller_id = post.id_user, product_id = post.id_product, price = post.price)
+            transaction = Transaction(buyer_id=current_user.id_user, seller_id=post.id_user, product_id=post.id_product,
+                                      price=post.price)
             db.session.add(transaction)
             product.id_user = current_user.id_user
             post.status = "closed"
@@ -232,14 +224,57 @@ def buy_product(id_post):
             flash('You have successfully bought the product!', 'success')
             return redirect(url_for('posts'))
 
-
-        return jsonify({'message': 'Transaction created successfully'}), 201
     else:
         return redirect(url_for('get_post', post_id=id_post))
+
+
+@app.route('/message')
+@login_required
+def message():
+    return render_template('message.html', username=current_user.username)
 
 @app.route('/')
 def home():
     return render_template("index.html")
 
+
+from flask import request, jsonify
+from flask_socketio import emit
+
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    message = request.json['message']
+    post_id = request.json['post_id']
+    user_id = request.json['user_id']
+
+    # Send email message to post owner using SendGrid or another email provider
+    # ...
+
+    return jsonify({'success': True})
+
+
+@app.route('/receive_message', methods=['POST'])
+def receive_message():
+    message = request.json['message']
+    post_id = request.json['post_id']
+    user_id = request.json['user_id']
+
+    emit('message_received', {'message': message, 'user_id': user_id}, room=post_id)
+
+    return jsonify({'success': True})
+
+#######################################################
+@socketio.on('join')
+def handle_join(data):
+    room = data['post_id']
+    join_room(room)
+
+@socketio.on('send_message')
+def handle_send_message(data):
+    emit('receive_message', data, room=data['post_id'])
+
+#######################################################
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True,allow_unsafe_werkzeug=True)

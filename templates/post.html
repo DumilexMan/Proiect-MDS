@@ -2,15 +2,49 @@
 <html lang="en">
 <head>
     <title>Post Details</title>
+    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js" integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA==" crossorigin="anonymous"></script>
+
 </head>
 <body>
     <h1>{{ post.title }}</h1>
     <p>{{ post.description }}</p>
     <p>Price: {{ post.price }}</p>
     <p>Status: {{ post.status }}</p>
-    <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
-    <button type="submit">Cumpara</button>
-</form>
 
+    <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
+        <button type="submit">Cumpara</button>
+    </form>
+     <button onclick="showMessageModal()">Trimiteți un mesaj către proprietar</button>
+
+    <div id="message-modal" style="display: none;">
+        <form onsubmit="sendMessage(); return false;">
+            <label for="message">Mesaj:</label>
+            <textarea id="message" name="message" rows="4" cols="50"></textarea>
+            <br>
+            <button type="submit">Trimite</button>
+        </form>
+    </div>
+
+{#    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>#}
+{#    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js" integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA==" crossorigin="anonymous"></script>#}
+    <script>
+        var socket = io.connect();
+
+        function showMessageModal() {
+            $('#message-modal').show();
+        }
+
+        function sendMessage() {
+            var message = $('#message').val();
+                socket.emit('send_message', { message: message, post_id: "{{ post.id_post }}", user_id: "{{ current_user.id }}" });
+            $('#message-modal').hide();
+            alert('Mesajul dvs. a fost trimis!');
+        }
+
+        socket.on('message_received', function(data) {
+            alert('Ați primit un nou mesaj de la utilizatorul cu ID-ul ' + data.user_id + ': ' + data.message);
+        });
+    </script>
 </body>
 </html>
