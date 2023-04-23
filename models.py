@@ -6,7 +6,7 @@ from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:mirceapetcu@localhost/mds_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/test'
 app.secret_key = "proiect_Scolar"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.permanent_session_lifetime = timedelta(hours=1)
@@ -68,18 +68,6 @@ class Auction(db.Model):
     start_date = db.Column(db.DateTime)
     end_date = db.Column(db.DateTime)
     id_product = db.Column(db.Integer, db.ForeignKey('products.id_product'), nullable=False)
-    status = db.Column(Enum('active', 'closed'), nullable=False, default='active')
-    winner_id = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=True)
-    title = db.Column(db.String(100),nullable=False)
-    description = db.Column(db.Text,nullable=False)
-
-class Bid(db.Model):
-    __tablename__ = 'bids'
-    id_bid = db.Column(db.Integer, primary_key = True)
-    id_user = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
-    id_auction = db.Column(db.Integer, db.ForeignKey('auctions.id_auction'), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Transaction(db.Model):
     __tablename__ = 'transactions'
@@ -89,6 +77,16 @@ class Transaction(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id_product'),nullable=False)
     price = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Message(db.Model):
+    __tablename__ = 'Message'
+    id_message = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    message_text = db.Column(db.String(1000), nullable=False)
+    message_time = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 
 with app.app_context():
     # Create database tables

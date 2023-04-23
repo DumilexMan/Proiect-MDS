@@ -1,7 +1,7 @@
 # import socketio
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
-from models import app, db, User, Product, Post, Auction, Transaction, Bid
+from models import app, db, User, Product, Post, Auction, Transaction, Message
 import hashlib
 from datetime import datetime, timedelta
 import json
@@ -118,7 +118,7 @@ def add_product():
         name = request.form['name']
         price = request.form['price']
         category = request.form['category']
-        user = current_user
+        user = get_user_by_username(session['user'])
         if user is None:
             return redirect(url_for('login'))
         else:
@@ -190,7 +190,7 @@ def posts():
     return render_template('posts.html', posts=posts)
 
 
-@app.route('/posts/<int:post_id>', methods=['POST','GET'])
+@app.route('/posts/<int:post_id>', methods=['POST', 'GET'])
 def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
@@ -199,7 +199,6 @@ def get_post(post_id):
     #     owner_username = request.form['owner_username']
     #     socketio.emit('direct_message', {'message': message, 'ownerUsername': owner_username})
     return render_template('post.html', post=post)
-
 
 
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
@@ -227,85 +226,11 @@ def buy_product(id_post):
     else:
         return redirect(url_for('get_post', post_id=id_post))
 
-######Auction######
-@app.route('/auctions/create', methods=['GET','POST'])
-def create_auction():
-    if request.method == 'POST':
-        id_user = request.form['id_user']
-        starting_price = request.form['starting_price']
-        start_date = request.form['start_date']
-        end_date = request.form['end_date']
-        id_product = request.form['id_product']
 
-        # crearea obiectului Auction și salvarea în baza de date
-        auction = Auction(id_user=id_user, starting_price=starting_price, curent_price=starting_price,
-                          start_date=start_date, end_date=end_date, id_product=id_product)
-        db.session.add(auction)
-        db.session.commit()
-        return redirect(url_for('auctions'))
-    else:
-        return render_template('create_auction.html', datetime=datetime)
-
-@app.route('/auctions', methods=['GET'])
-def auctions():
-    auctions = Auction.query.all()
-    return render_template('auctions.html', auctions=auctions)
-
-@app.route('/auctions/<int:id_auction>', methods=['GET'])
-def get_auction(id_auction):
-    auction = Auction.query.get_or_404(id_auction)
-    return render_template('auction.html', auction=auction,id_auction = id_auction)
-
-@app.route('/auctions/<int:auction_id>/add_bid', methods=['POST', 'GET'])
+@app.route('/message')
 @login_required
-def add_bid(auction_id):
-    if request.method == 'POST':
-        auction = Auction.query.get_or_404(auction_id)
-        product = Product.query.get_or_404(auction.id_product)
-        if auction.id_user == current_user.id_user:
-            flash('You cannot bid on your own product!', 'warning')
-            return redirect(url_for('get_auction', auction_id=auction_id))
-        elif auction.status == 'closed':
-            flash('This product is already sold!', 'warning')
-            return redirect(url_for('get_auction', auction_id=auction_id))
-        else:
-            id_user = current_user.id_user
-            price = request.form['price']
-            bid = Bid(id_user=id_user, price=price, id_auction=auction_id)
-            if int(price) > int(auction.curent_price):
-                auction.curent_price = bid.price
-                auction.winner_id = bid.id_user
-                db.session.commit()
-                flash('You have successfully bid on the product!', 'success')
-                return redirect(url_for('auctions'))
-            else:
-                flash('Your bid is lower than the current price!', 'warning')
-                return redirect(url_for('get_auction', auction_id=auction_id))
-    else:
-        return redirect(url_for('get_auction', auction_id=auction_id))
-
-@app.route('/auctions/<int:auction_id>/close', methods=['POST', 'GET'])
-@login_required
-def close_auction(auction_id):
-    if request.method == 'POST':
-        auction = Auction.query.get_or_404(auction_id)
-        product = Product.query.get_or_404(auction.id_product)
-        if auction.id_user == current_user.id_user:
-            auction.status = 'closed'
-            product.id_user = auction.winner_id
-            transaction = Transaction(buyer_id=auction.winner_id, seller_id=auction.id_user, product_id=auction.id_product,
-                                      price=auction.curent_price)
-            db.session.add(transaction)
-            db.session.commit()
-            flash('You have successfully closed the auction!', 'success')
-            return redirect(url_for('auctions'))
-        else:
-            flash('You cannot close this auction!', 'warning')
-            return redirect(url_for('get_auction', auction_id=auction_id))
-    else:
-        return redirect(url_for('get_auction', auction_id=auction_id))
-
-
+def message():
+    return render_template('message.html', username=current_user.username)
 
 
 @app.route('/')
@@ -313,33 +238,32 @@ def home():
     return render_template("index.html")
 
 
-
-############################################################################################################
 from flask import request, jsonify
 from flask_socketio import emit
 
 
-@app.route('/send_message', methods=['POST'])
-def send_message():
-    message = request.json['message']
-    post_id = request.json['post_id']
-    user_id = request.json['user_id']
-
-    # Send email message to post owner using SendGrid or another email provider
-    # ...
-
-    return jsonify({'success': True})
-
-
-@app.route('/receive_message', methods=['POST'])
-def receive_message():
-    message = request.json['message']
-    post_id = request.json['post_id']
-    user_id = request.json['user_id']
-
-    emit('message_received', {'message': message, 'user_id': user_id}, room=post_id)
-
-    return jsonify({'success': True})
+#
+# @app.route('/send_message', methods=['POST'])
+# def send_message():
+#     message = request.json['message']
+#     post_id = request.json['post_id']
+#     user_id = request.json['user_id']
+#
+#     # Send email message to post owner using SendGrid or another email provider
+#     # ...
+#
+#     return jsonify({'success': True})
+#
+#
+# @app.route('/receive_message', methods=['POST'])
+# def receive_message():
+#     message = request.json['message']
+#     post_id = request.json['post_id']
+#     user_id = request.json['user_id']
+#
+#     emit('message_received', {'message': message, 'user_id': user_id}, room=post_id)
+#
+#     return jsonify({'success': True})
 
 #######################################################
 @socketio.on('join')
@@ -347,14 +271,48 @@ def handle_join(data):
     room = data['post_id']
     join_room(room)
 
-@socketio.on('send_message')
-def handle_send_message(data):
-    emit('receive_message', data, room=data['post_id'])
+
+# @socketio.on('send_message')
+# def handle_send_message(data):
+#     emit('receive_message', data, room=data['post_id'])
 
 #######################################################
 
 
+@app.route('/send_message', methods=['GET', 'POST'])
+def send_message():
+    # Parse request data
+    if request.method=='POST':
+        sender_id = request.form['sender_id']
+        receiver_id = request.form['receiver_id']
+        message_text = request.form['message_text']
+
+        # Validate request data
+        if not sender_id or not receiver_id or not message_text:
+            return 'Toate câmpurile sunt obligatorii!', 400
+
+        # Create a new message
+        new_message = Message(sender_id=sender_id,
+                              receiver_id=receiver_id,
+                              message_text=message_text)
+
+        # Add message to database
+        db.session.add(new_message)
+        db.session.commit()
+
+    else:
+        return render_template('send_message.html')
+
+
+
+@app.route('/view_messages/<int:sender_id>/<int:receiver_id>')
+def messages(sender_id, receiver_id):
+    sender = User.query.get(sender_id)
+    receiver = User.query.get(receiver_id)
+    messages = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).all()
+
+    return render_template('view_messages.html', sender=sender, receiver=receiver, messages=messages)
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True,allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
