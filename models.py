@@ -6,6 +6,7 @@ from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:mirceapetcu@localhost/mds_db'
 app.secret_key = "proiect_Scolar"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True

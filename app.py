@@ -67,7 +67,7 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('dashboard'))
-    return render_template('login.html', form=form)
+    return render_template('Login/login.html', form=form)
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -104,7 +104,7 @@ def register():
         flash('Your account has been created! You are now able to log in.', 'success')
         return redirect(url_for('login'))
 
-    return render_template('register.html', form=form)
+    return render_template('Register/register.html', form=form)
 
 
 def get_user_by_username(username):
