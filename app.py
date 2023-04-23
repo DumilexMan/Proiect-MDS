@@ -1,7 +1,7 @@
 # import socketio
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
-from models import app, db, User, Product, Post, Auction, Transaction
+from models import app, db, User, Product, Post, Auction, Transaction, Bid
 import hashlib
 from datetime import datetime, timedelta
 import json
@@ -67,7 +67,7 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('dashboard'))
-    return render_template('Login/login.html', form=form)
+    return render_template('login.html', form=form)
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -104,7 +104,7 @@ def register():
         flash('Your account has been created! You are now able to log in.', 'success')
         return redirect(url_for('login'))
 
-    return render_template('Register/register.html', form=form)
+    return render_template('register.html', form=form)
 
 
 def get_user_by_username(username):
@@ -118,7 +118,7 @@ def add_product():
         name = request.form['name']
         price = request.form['price']
         category = request.form['category']
-        user = get_user_by_username(session['user'])
+        user = current_user
         if user is None:
             return redirect(url_for('login'))
         else:
@@ -227,17 +227,94 @@ def buy_product(id_post):
     else:
         return redirect(url_for('get_post', post_id=id_post))
 
+######Auction######
+@app.route('/auctions/create', methods=['GET','POST'])
+def create_auction():
+    if request.method == 'POST':
+        id_user = request.form['id_user']
+        starting_price = request.form['starting_price']
+        start_date = request.form['start_date']
+        end_date = request.form['end_date']
+        id_product = request.form['id_product']
 
-@app.route('/message')
+        # crearea obiectului Auction și salvarea în baza de date
+        auction = Auction(id_user=id_user, starting_price=starting_price, curent_price=starting_price,
+                          start_date=start_date, end_date=end_date, id_product=id_product)
+        db.session.add(auction)
+        db.session.commit()
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('create_auction.html', datetime=datetime)
+
+@app.route('/auctions', methods=['GET'])
+def auctions():
+    auctions = Auction.query.all()
+    return render_template('auctions.html', auctions=auctions)
+
+@app.route('/auctions/<int:id_auction>', methods=['GET'])
+def get_auction(id_auction):
+    auction = Auction.query.get_or_404(id_auction)
+    return render_template('auction.html', auction=auction,id_auction = id_auction)
+
+@app.route('/auctions/<int:auction_id>/add_bid', methods=['POST', 'GET'])
 @login_required
-def message():
-    return render_template('message.html', username=current_user.username)
+def add_bid(auction_id):
+    if request.method == 'POST':
+        auction = Auction.query.get_or_404(auction_id)
+        product = Product.query.get_or_404(auction.id_product)
+        if auction.id_user == current_user.id_user:
+            flash('You cannot bid on your own product!', 'warning')
+            return redirect(url_for('get_auction', auction_id=auction_id))
+        elif auction.status == 'closed':
+            flash('This product is already sold!', 'warning')
+            return redirect(url_for('get_auction', auction_id=auction_id))
+        else:
+            id_user = current_user.id_user
+            price = request.form['price']
+            bid = Bid(id_user=id_user, price=price, id_auction=auction_id)
+            if int(price) > int(auction.curent_price):
+                auction.curent_price = bid.price
+                auction.winner_id = bid.id_user
+                db.session.commit()
+                flash('You have successfully bid on the product!', 'success')
+                return redirect(url_for('auctions'))
+            else:
+                flash('Your bid is lower than the current price!', 'warning')
+                return redirect(url_for('get_auction', auction_id=auction_id))
+    else:
+        return redirect(url_for('get_auction', auction_id=auction_id))
+
+@app.route('/auctions/<int:auction_id>/close', methods=['POST', 'GET'])
+@login_required
+def close_auction(auction_id):
+    if request.method == 'POST':
+        auction = Auction.query.get_or_404(auction_id)
+        product = Product.query.get_or_404(auction.id_product)
+        if auction.id_user == current_user.id_user:
+            auction.status = 'closed'
+            product.id_user = auction.winner_id
+            transaction = Transaction(buyer_id=auction.winner_id, seller_id=auction.id_user, product_id=auction.id_product,
+                                      price=auction.curent_price)
+            db.session.add(transaction)
+            db.session.commit()
+            flash('You have successfully closed the auction!', 'success')
+            return redirect(url_for('auctions'))
+        else:
+            flash('You cannot close this auction!', 'warning')
+            return redirect(url_for('get_auction', auction_id=auction_id))
+    else:
+        return redirect(url_for('get_auction', auction_id=auction_id))
+
+
+
 
 @app.route('/')
 def home():
     return render_template("index.html")
 
 
+
+############################################################################################################
 from flask import request, jsonify
 from flask_socketio import emit
 
@@ -275,6 +352,9 @@ def handle_send_message(data):
     emit('receive_message', data, room=data['post_id'])
 
 #######################################################
+
+
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True,allow_unsafe_werkzeug=True)
