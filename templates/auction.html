@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Auction</title>
+</head>
+<body>
+    <h1>{{ auction.title }}</h1>
+    <p>Description: {{ auction.description }}</p>
+    <p>Starting Bid: {{ auction.starting_bid }}</p>
+    <p>Current Bid: {{ auction.curent_bid }}</p>
+    <p>Current Bid: {{ auction.status }}</p>
+    <form method="POST" action="{{ url_for('add_bid', auction_id=auction.id_auction) }}">
+    <button type="submit">Add Bid</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Listă licitații</title>
+</head>
+<body>
+    <h1>Listă licitații</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID licitație</th>
+                <th>ID utilizator</th>
+                <th>Preț de pornire</th>
+                <th>Preț curent</th>
+                <th>Data și ora de început</th>
+                <th>Data și ora de încheiere</th>
+                <th>ID produs</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for auction in auctions %}
+                <tr>
+                    <td>{{ auction.id_auction }}</td>
+                    <td>{{ auction.id_user }}</td>
+                    <td>{{ auction.starting_price }}</td>
+                    <td>{{ auction.curent_price }}</td>
+                    <td>{{ auction.start_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+                    <td>{{ auction.end_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+                    <td>{{ auction.id_product }}</td>
+                    <td><form method="GET" action="{{ url_for('get_auction', id_auction=auction.id_auction) }}">
+                        <button type="submit">Acces auction</button>
+                    </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
