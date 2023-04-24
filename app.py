@@ -142,11 +142,11 @@ def create_post():
         title = request.form['title']
         description = request.form['description']
         price = request.form['price']
-        image_url = request.form['image_url']
+        # image_url = request.form['image_url']
         start_date = datetime.now()
         end_date = start_date + timedelta(days=30)
         id_product = request.form['id_product']
-        user = get_user_by_username(session['user'])
+        user = current_user
         if user is None:
             return redirect(url_for('login'))
         else:
@@ -174,7 +174,7 @@ def products():
 @app.route('/posts_ownded_by_user')
 @login_required
 def posts_ownded_by_user():
-    user = get_user_by_username(session['user'])
+    user = current_user
     posts = Post.query.filter_by(id_user=user.id_user).all()
     post_list = []
     for post in posts:
@@ -194,10 +194,6 @@ def posts():
 def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
-    # if request.method == 'POST':
-    #     message = request.form['message']
-    #     owner_username = request.form['owner_username']
-    #     socketio.emit('direct_message', {'message': message, 'ownerUsername': owner_username})
     return render_template('post.html', post=post)
 
 
@@ -229,16 +225,18 @@ def buy_product(id_post):
 
 ######Auction######
 @app.route('/auctions/create', methods=['GET','POST'])
+@login_required
 def create_auction():
     if request.method == 'POST':
-        id_user = request.form['id_user']
+        id_user = current_user.id_user
+        title = request.form['title']
         starting_price = request.form['starting_price']
         start_date = request.form['start_date']
         end_date = request.form['end_date']
         id_product = request.form['id_product']
-
+        description = request.form['description']
         # crearea obiectului Auction și salvarea în baza de date
-        auction = Auction(id_user=id_user, starting_price=starting_price, curent_price=starting_price,
+        auction = Auction(description=description,title = title,id_user=id_user, starting_price=starting_price, curent_price=starting_price,
                           start_date=start_date, end_date=end_date, id_product=id_product)
         db.session.add(auction)
         db.session.commit()
@@ -255,6 +253,9 @@ def auctions():
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
     return render_template('auction.html', auction=auction,id_auction = id_auction)
+@app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
+def create_bid(id_auction):
+    return render_template('create_bid.html', id_auction=id_auction)
 
 @app.route('/auctions/<int:auction_id>/add_bid', methods=['POST', 'GET'])
 @login_required
@@ -264,14 +265,15 @@ def add_bid(auction_id):
         product = Product.query.get_or_404(auction.id_product)
         if auction.id_user == current_user.id_user:
             flash('You cannot bid on your own product!', 'warning')
-            return redirect(url_for('get_auction', auction_id=auction_id))
+            return redirect(url_for('get_auction', id_auction=auction_id))
         elif auction.status == 'closed':
             flash('This product is already sold!', 'warning')
-            return redirect(url_for('get_auction', auction_id=auction_id))
+            return redirect(url_for('get_auction', id_auction=auction_id))
         else:
             id_user = current_user.id_user
             price = request.form['price']
             bid = Bid(id_user=id_user, price=price, id_auction=auction_id)
+            db.session.add(bid)
             if int(price) > int(auction.curent_price):
                 auction.curent_price = bid.price
                 auction.winner_id = bid.id_user
@@ -280,9 +282,9 @@ def add_bid(auction_id):
                 return redirect(url_for('auctions'))
             else:
                 flash('Your bid is lower than the current price!', 'warning')
-                return redirect(url_for('get_auction', auction_id=auction_id))
+                return redirect(url_for('get_auction', id_auction=auction_id))
     else:
-        return redirect(url_for('get_auction', auction_id=auction_id))
+        return redirect(url_for('add_bid', auction_id=auction_id))
 
 @app.route('/auctions/<int:auction_id>/close', methods=['POST', 'GET'])
 @login_required
@@ -314,44 +316,6 @@ def home():
 
 
 
-############################################################################################################
-from flask import request, jsonify
-from flask_socketio import emit
-
-
-@app.route('/send_message', methods=['POST'])
-def send_message():
-    message = request.json['message']
-    post_id = request.json['post_id']
-    user_id = request.json['user_id']
-
-    # Send email message to post owner using SendGrid or another email provider
-    # ...
-
-    return jsonify({'success': True})
-
-
-@app.route('/receive_message', methods=['POST'])
-def receive_message():
-    message = request.json['message']
-    post_id = request.json['post_id']
-    user_id = request.json['user_id']
-
-    emit('message_received', {'message': message, 'user_id': user_id}, room=post_id)
-
-    return jsonify({'success': True})
-
-#######################################################
-@socketio.on('join')
-def handle_join(data):
-    room = data['post_id']
-    join_room(room)
-
-@socketio.on('send_message')
-def handle_send_message(data):
-    emit('receive_message', data, room=data['post_id'])
-
-#######################################################
 
 
 

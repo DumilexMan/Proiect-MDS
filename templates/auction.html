@@ -9,7 +9,7 @@
     <p>Starting Bid: {{ auction.starting_bid }}</p>
     <p>Current Bid: {{ auction.curent_bid }}</p>
     <p>Current Bid: {{ auction.status }}</p>
-    <form method="POST" action="{{ url_for('add_bid', auction_id=auction.id_auction) }}">
+    <form method="GET" action="{{ url_for('create_bid', id_auction=auction.id_auction) }}">
     <button type="submit">Add Bid</button>
     </form>
 </body>
