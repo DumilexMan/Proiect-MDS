@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +8,21 @@
 
 </head>
 <body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
     <h1>{{ post.title }}</h1>
     <p>{{ post.description }}</p>
     <p>Price: {{ post.price }}</p>
     <p>Status: {{ post.status }}</p>
-
+    <p>Star Date: {{ post.start_date }}</p>
+    <p>End Date: {{ post.end_date }}</p>
     <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
         <button type="submit">Cumpara</button>
     </form>
