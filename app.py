@@ -67,13 +67,22 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('dashboard'))
+            else:
+                flash('Invalid username or password', 'danger')
+                return redirect(url_for('login',form=form))
+        else:
+            flash('Invalid username or password', 'danger')
+            return redirect(url_for('login',form=form))
     return render_template('login.html', form=form)
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    posts = Post.query.filter_by(id_user=current_user.id_user).all()
+    products = Product.query.filter_by(id_user=current_user.id_user).all()
+    auctions = Auction.query.filter_by(id_user=current_user.id_user).all()
+    return render_template('dashboard.html', posts=posts, products=products,auctions=auctions)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -110,6 +119,26 @@ def register():
 def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
 
+@app.route('/edit_data', methods=['GET', 'POST'])
+@login_required
+def edit_data():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        address = request.form['address']
+        password = bcrypt.generate_password_hash(request.form['password']).decode('utf-8'),
+        user = current_user
+        if user is None:
+            return redirect(url_for('login'))
+        else:
+            user.username = username
+            user.email = email
+            user.password= password
+            user.address = address
+            db.session.commit()
+            return redirect(url_for('dashboard'))
+    else:
+        return render_template('edit_data.html')
 
 @app.route('/add_product', methods=['GET', 'POST'])
 @login_required
@@ -147,6 +176,13 @@ def create_post():
         end_date = start_date + timedelta(days=30)
         id_product = request.form['id_product']
         user = current_user
+        product = Product.query.filter_by(id_product=id_product).first()
+        if product is None:
+            flash('This product does not exist.')
+            return redirect(url_for('create_post'))
+        if product.id_user != user.id_user:
+            flash('This product does not belong to you.')
+            return redirect(url_for('create_post'))
         if user is None:
             return redirect(url_for('login'))
         else:
@@ -235,7 +271,26 @@ def create_auction():
         end_date = request.form['end_date']
         id_product = request.form['id_product']
         description = request.form['description']
-        # crearea obiectului Auction și salvarea în baza de date
+        if start_date > end_date:
+            flash('The start date must be before the end date!', 'warning')
+            return redirect(url_for('create_auction'))
+        if start_date < datetime.now():
+            flash('The start date must be in the future!', 'warning')
+            return redirect(url_for('create_auction'))
+        if end_date < datetime.now():
+            flash('The end date must be in the future!', 'warning')
+            return redirect(url_for('create_auction'))
+        if starting_price < 0:
+            flash('The price must be positive!', 'warning')
+            return redirect(url_for('create_auction'))
+        product = Product.qeur.filter_by(id_product=id_product).first()
+        if product is None:
+            flash('This product does not exist.')
+            return redirect(url_for('create_auction'))
+        if product.id_user != id_user:
+            flash('This product does not belong to you.')
+            return redirect(url_for('create_auction'))
+
         auction = Auction(description=description,title = title,id_user=id_user, starting_price=starting_price, curent_price=starting_price,
                           start_date=start_date, end_date=end_date, id_product=id_product)
         db.session.add(auction)
@@ -247,6 +302,9 @@ def create_auction():
 @app.route('/auctions', methods=['GET'])
 def auctions():
     auctions = Auction.query.all()
+    if auctions is None:
+        flash('There are no auctions.')
+        return redirect(url_for('index'))
     return render_template('auctions.html', auctions=auctions)
 
 @app.route('/auctions/<int:id_auction>', methods=['GET'])
