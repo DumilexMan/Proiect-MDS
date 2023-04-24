@@ -6,27 +6,19 @@
 </head>
 <body>
 
-<h1>Messages</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>De la</th>
-          <th>Către</th>
-          <th>Mesaj</th>
-          <th>Data și ora</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for message in messages %}
-          <tr>
-            <td>{{ message.sender_name }}</td>
-            <td>{{ message.receiver_name }}</td>
-            <td>{{ message.message_text }}</td>
-            <td>{{ message.message_time }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+ {% for user_id, user_messages in messages_dict %}
+      <tr>
+          {%for %}
+        <td>{{ user_messages['username'] }}</td>
+        <td>
+          <ul>
+            {% for message in user_messages['messages'] %}
+              <li>{{ message.message_text }}</li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+    {% endfor %}
 
 </body>
 </html>

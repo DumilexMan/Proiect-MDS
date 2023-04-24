@@ -118,7 +118,7 @@ def add_product():
         name = request.form['name']
         price = request.form['price']
         category = request.form['category']
-        user = get_user_by_username(session['user'])
+        user = current_user
         if user is None:
             return redirect(url_for('login'))
         else:
@@ -146,7 +146,7 @@ def create_post():
         start_date = datetime.now()
         end_date = start_date + timedelta(days=30)
         id_product = request.form['id_product']
-        user = get_user_by_username(session['user'])
+        user = current_user
         if user is None:
             return redirect(url_for('login'))
         else:
@@ -174,7 +174,7 @@ def products():
 @app.route('/posts_ownded_by_user')
 @login_required
 def posts_ownded_by_user():
-    user = get_user_by_username(session['user'])
+    user = current_user
     posts = Post.query.filter_by(id_user=user.id_user).all()
     post_list = []
     for post in posts:
@@ -278,17 +278,17 @@ def handle_join(data):
 
 #######################################################
 
-
 @app.route('/send_message', methods=['GET', 'POST'])
+@login_required
 def send_message():
     # Parse request data
-    if request.method=='POST':
-        sender_id = request.form['sender_id']
+    if request.method == 'POST':
+        sender_id = current_user.id_user
         receiver_id = request.form['receiver_id']
         message_text = request.form['message_text']
 
         # Validate request data
-        if not sender_id or not receiver_id or not message_text:
+        if not receiver_id or not message_text:
             return 'Toate câmpurile sunt obligatorii!', 400
 
         # Create a new message
@@ -300,16 +300,65 @@ def send_message():
         db.session.add(new_message)
         db.session.commit()
 
+        # Return success message
+        flash('Mesajul a fost trimis cu succes!', 'success')
+        return redirect(url_for('send_message'))
+
     else:
         return render_template('send_message.html')
 
+@app.route('/messages', methods=['POST', 'GET'])
+@login_required
+def messages():
+    # Obtine utilizatorul curent
+    user = current_user
+
+    # Obține mesajele primite
+    received_messages = Message.query.filter_by(receiver_id=user.id_user).all()
+
+    # Obține mesajele trimise
+    sent_messages = Message.query.filter_by(sender_id=user.id_user).all()
+
+    # Creeaza un dictionar cu toate mesajele grupate dupa utilizatorul corespondent
+    messages_dict = {}
+    for message in received_messages:
+        if message.sender_id not in messages_dict:
+            sender = User.query.filter_by(id_user = message.sender_id).first()
+            messages_dict[message.sender_id] = {'username': sender.username, 'messages': [message]}
+        else:
+            messages_dict[message.sender_id]['messages'].append(message)
+
+    for message in sent_messages:
+        if message.receiver_id not in messages_dict:
+            messages_dict[message.receiver_id] = {'username': message.receiver.username, 'messages': [message]}
+        else:
+            messages_dict[message.receiver_id]['messages'].append(message)
+
+    # Rendereaza pagina html cu mesajele
+    return render_template('view_messages.html', messages=messages_dict)
+
+
+@app.route('/view_messages')
+@login_required
+def view_message():
+    id_us = current_user.id_user
+    messages = Message.query.filter_by(receiver_id=id_us).all()
+    messages += Message.query.filter_by(sender_id=id_us).all()
+    # s_name =
+    # nume sender
+    user = User.query.filter_by(id_user=id_us).first()
+    r_name = user.username if user else None
+    # nume receiver
+
+    return render_template('view_messages.html', reciever=r_name, messages=messages)
 
 
 @app.route('/view_messages/<int:sender_id>/<int:receiver_id>')
-def messages(sender_id, receiver_id):
+def messages_pers(sender_id, receiver_id):
+    sender_id = current_user.id_user
     sender = User.query.get(sender_id)
     receiver = User.query.get(receiver_id)
-    messages = Message.query.filter_by(sender_id=sender_id, receiver_id=receiver_id).all()
+    messages = Message.query.filter_by(receiver_id=receiver_id).all()
 
     return render_template('view_messages.html', sender=sender, receiver=receiver, messages=messages)
 
