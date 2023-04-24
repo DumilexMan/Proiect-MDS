@@ -307,6 +307,10 @@ def send_message():
     else:
         return render_template('send_message.html')
 
+
+# Functie pentru a vizualiza mesajele
+# Se foloseste de id-ul personal al utilizatorului logat
+# Este nevoie sa fie logat
 @app.route('/messages', methods=['POST', 'GET'])
 @login_required
 def messages():
@@ -320,37 +324,67 @@ def messages():
     sent_messages = Message.query.filter_by(sender_id=user.id_user).all()
 
     # Creeaza un dictionar cu toate mesajele grupate dupa utilizatorul corespondent
-    messages_dict = {}
-    for message in received_messages:
-        if message.sender_id not in messages_dict:
-            sender = User.query.filter_by(id_user = message.sender_id).first()
-            messages_dict[message.sender_id] = {'username': sender.username, 'messages': [message]}
-        else:
-            messages_dict[message.sender_id]['messages'].append(message)
-
-    for message in sent_messages:
-        if message.receiver_id not in messages_dict:
-            messages_dict[message.receiver_id] = {'username': message.receiver.username, 'messages': [message]}
-        else:
-            messages_dict[message.receiver_id]['messages'].append(message)
+    # messages_dict = {}
+    # for message in received_messages:
+    #     if message.sender_id not in messages_dict:
+    #         messages_dict[sender.username] = {'username': sender.username, 'messages': [message.message_text]}
+    #     else:
+    #         messages_dict[sender.username]['messages'].append(message.message_text)
+    #
+    # for message in sent_messages:
+    #     receiver = User.query.filter_by(id_user=message.receiver_id).first()
+    #     if message.receiver_id not in messages_dict:
+    #         messages_dict[receiver.username] = {'username': receiver.username, 'messages': [message.message_text]}
+    #     else:
+    #         messages_dict[receiver.username]['messages'].append(message.message_text)
 
     # Rendereaza pagina html cu mesajele
-    return render_template('view_messages.html', messages=messages_dict)
+
+    # Cum o sa fac:
+    # O sa adun toata conversatia cu cineva si ii pun ca cheie id-ul persoanei careia i-a fost trimis un mesaj
+    # O sa le ordonez dupa data ca sa fie aranjate frumos
+
+    mesaje_dict = {}
+
+    # aici sunt mesajele trimise
+    # ele au sender id-ul meu
+    # o sa aiba si reciever id-ul persoanei cu care m-am conversat
+    for mesaj in sent_messages:
+        receiver = User.query.filter_by(id_user=mesaj.receiver_id).first()
+        if receiver.username not in mesaje_dict:
+            mesaje_dict[receiver.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
+        else:
+            mesaje_dict[receiver.username]['messages'].append({'text': mesaj.message_text, 'time': mesaj.message_time})
+
+    # Acum avem toate mesajele pe care le-am trimis
+    # Ne trebuie mesajele pe care le-am primit
+
+    for mesaj in received_messages:
+        sender = User.query.filter_by(id_user=mesaj.sender_id).first()
+        if sender.username not in mesaje_dict:
+            mesaje_dict[sender.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
+        else:
+            mesaje_dict[sender.username]['messages'].append({'text': mesaj.message_text, 'time': mesaj.message_time})
+
+    sorted_dict = dict(sorted(mesaje_dict.items(), key=lambda x: x[1]['messages'][-1]['time']))
+
+    return render_template('view_messages.html', messages=sorted_dict)
 
 
-@app.route('/view_messages')
-@login_required
-def view_message():
-    id_us = current_user.id_user
-    messages = Message.query.filter_by(receiver_id=id_us).all()
-    messages += Message.query.filter_by(sender_id=id_us).all()
-    # s_name =
-    # nume sender
-    user = User.query.filter_by(id_user=id_us).first()
-    r_name = user.username if user else None
-    # nume receiver
-
-    return render_template('view_messages.html', reciever=r_name, messages=messages)
+#
+# @app.route('/view_messages')
+# @login_required
+# def view_message():
+#     id_us = current_user.id_user
+#     messages = Message.query.filter_by(receiver_id=id_us).all()
+#     messages += Message.query.filter_by(sender_id=id_us).all()
+#     # s_name =
+#     # nume sender
+#     user = User.query.filter_by(id_user=id_us).first()
+#     r_name = user.username if user else None
+#     # nume receiver
+#
+#     return render_template('view_messages.html', reciever=r_name, messages=messages)
 
 
 @app.route('/view_messages/<int:sender_id>/<int:receiver_id>')

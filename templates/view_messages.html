@@ -1,24 +1,24 @@
+
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html>
+  <head>
     <title>Messages</title>
-</head>
-<body>
-
- {% for user_id, user_messages in messages_dict %}
-      <tr>
-          {%for %}
-        <td>{{ user_messages['username'] }}</td>
-        <td>
-          <ul>
-            {% for message in user_messages['messages'] %}
-              <li>{{ message.message_text }}</li>
-            {% endfor %}
-          </ul>
-        </td>
-      </tr>
-    {% endfor %}
-
-</body>
+  </head>
+  <body>
+    <h1>Messages</h1>
+    <table>
+      {% for key, value in messages.items() %}
+        <tr>
+          <td>{{ key }}</td>
+          <td>
+            <ul>
+              {% for message in value['messages'] %}
+                <li>{{ message['text'] }}</li>
+              {% endfor %}
+            </ul>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
 </html>
