@@ -7,10 +7,12 @@
 <body>
     <h1>Creează o licitație nouă</h1>
     <form action="{{ url_for('create_auction') }}" method="POST">
-        <label for="id_user">ID utilizator:</label>
-        <input type="text" name="id_user" required><br>
+        <label for="title">Titlu:</label>
+        <input type="text" name="title" required><br>
         <label for="starting_price">Preț de pornire:</label>
         <input type="number" name="starting_price" step="0.01" min="0" required><br>
+        <label for="description">Descriere:</label>
+        <input type="text" name="description" required><br>
         <label for="start_date">Data și ora de început:</label>
         <input type="datetime-local" name="start_date" required><br>
         <label for="end_date">Data și ora de încheiere:</label>

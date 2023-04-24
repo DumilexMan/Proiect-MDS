@@ -69,7 +69,7 @@ class Auction(db.Model):
     end_date = db.Column(db.DateTime)
     id_product = db.Column(db.Integer, db.ForeignKey('products.id_product'), nullable=False)
     status = db.Column(Enum('active', 'closed'), nullable=False, default='active')
-    winner_id = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=True)
+    winner_id = db.Column(db.Integer, db.ForeignKey('users.id_user'), default = None,nullable=True)
     title = db.Column(db.String(100),nullable=False)
     description = db.Column(db.Text,nullable=False)
 
