@@ -1,0 +1,24 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Messages</title>
+  </head>
+  <body>
+    <h1>Messages</h1>
+    <table>
+      {% for key, value in messages.items() %}
+        <tr>
+          <td>{{ key }}</td>
+          <td>
+            <ul>
+              {% for message in value['messages'] %}
+                <li>{{ message['text'] }}</li>
+              {% endfor %}
+            </ul>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

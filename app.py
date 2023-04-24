@@ -366,6 +366,103 @@ def close_auction(auction_id):
         return redirect(url_for('get_auction', auction_id=auction_id))
 
 
+#Functie pentru trimis mesaje
+@app.route('/send_message', methods=['GET', 'POST'])
+@login_required
+def send_message():
+    # Parse request data
+    if request.method == 'POST':
+        sender_id = current_user.id_user
+        receiver_id = request.form['receiver_id']
+        message_text = request.form['message_text']
+
+        # Validate request data
+        if not receiver_id or not message_text:
+            return 'Toate câmpurile sunt obligatorii!', 400
+
+        # Create a new message
+        new_message = Message(sender_id=sender_id,
+                              receiver_id=receiver_id,
+                              message_text=message_text)
+
+        # Add message to database
+        db.session.add(new_message)
+        db.session.commit()
+
+        # Return success message
+        flash('Mesajul a fost trimis cu succes!', 'success')
+        return redirect(url_for('send_message'))
+
+    else:
+        return render_template('send_message.html')
+
+
+
+
+# Functie pentru a vizualiza mesajele
+# Se foloseste de id-ul personal al utilizatorului logat
+# Este nevoie sa fie logat
+@app.route('/messages', methods=['POST', 'GET'])
+@login_required
+def messages():
+    # Obtine utilizatorul curent
+    user = current_user
+
+    # Obține mesajele primite
+    received_messages = Message.query.filter_by(receiver_id=user.id_user).all()
+
+    # Obține mesajele trimise
+    sent_messages = Message.query.filter_by(sender_id=user.id_user).all()
+
+    # Creeaza un dictionar cu toate mesajele grupate dupa utilizatorul corespondent
+    # messages_dict = {}
+    # for message in received_messages:
+    #     if message.sender_id not in messages_dict:
+    #         messages_dict[sender.username] = {'username': sender.username, 'messages': [message.message_text]}
+    #     else:
+    #         messages_dict[sender.username]['messages'].append(message.message_text)
+    #
+    # for message in sent_messages:
+    #     receiver = User.query.filter_by(id_user=message.receiver_id).first()
+    #     if message.receiver_id not in messages_dict:
+    #         messages_dict[receiver.username] = {'username': receiver.username, 'messages': [message.message_text]}
+    #     else:
+    #         messages_dict[receiver.username]['messages'].append(message.message_text)
+
+    # Rendereaza pagina html cu mesajele
+
+    # Cum o sa fac:
+    # O sa adun toata conversatia cu cineva si ii pun ca cheie id-ul persoanei careia i-a fost trimis un mesaj
+    # O sa le ordonez dupa data ca sa fie aranjate frumos
+
+    mesaje_dict = {}
+
+    # aici sunt mesajele trimise
+    # ele au sender id-ul meu
+    # o sa aiba si reciever id-ul persoanei cu care m-am conversat
+    for mesaj in sent_messages:
+        receiver = User.query.filter_by(id_user=mesaj.receiver_id).first()
+        if receiver.username not in mesaje_dict:
+            mesaje_dict[receiver.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
+        else:
+            mesaje_dict[receiver.username]['messages'].append({'text': mesaj.message_text, 'time': mesaj.message_time})
+
+    # Acum avem toate mesajele pe care le-am trimis
+    # Ne trebuie mesajele pe care le-am primit
+
+    for mesaj in received_messages:
+        sender = User.query.filter_by(id_user=mesaj.sender_id).first()
+        if sender.username not in mesaje_dict:
+            mesaje_dict[sender.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
+        else:
+            mesaje_dict[sender.username]['messages'].append({'text': mesaj.message_text, 'time': mesaj.message_time})
+
+    sorted_dict = dict(sorted(mesaje_dict.items(), key=lambda x: x[1]['messages'][-1]['time']))
+
+    return render_template('view_messages.html', messages=sorted_dict)
+
+
+
 
 
 @app.route('/')

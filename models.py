@@ -1,3 +1,4 @@
+
 from sqlalchemy import Enum
 from flask import Flask
 from flask_login import  UserMixin
@@ -89,6 +90,14 @@ class Transaction(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id_product'),nullable=False)
     price = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Message(db.Model):
+    __tablename__ = 'Message'
+    id_message = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    message_text = db.Column(db.String(1000), nullable=False)
+    message_time = db.Column(db.DateTime, default=datetime.utcnow)
 
 with app.app_context():
     # Create database tables
