@@ -1,7 +1,7 @@
 # import socketio
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
-from models import app, db, User, Product, Post, Auction, Transaction, Message
+from models import app, db, User, Product, Post, Auction, Transaction, Bid, Message
 import hashlib
 from datetime import datetime, timedelta
 import json
@@ -67,13 +67,22 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('dashboard'))
+            else:
+                flash('Invalid username or password', 'danger')
+                return redirect(url_for('login', form=form))
+        else:
+            flash('Invalid username or password', 'danger')
+            return redirect(url_for('login', form=form))
     return render_template('login.html', form=form)
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    posts = Post.query.filter_by(id_user=current_user.id_user).all()
+    products = Product.query.filter_by(id_user=current_user.id_user).all()
+    auctions = Auction.query.filter_by(id_user=current_user.id_user).all()
+    return render_template('dashboard.html', posts=posts, products=products, auctions=auctions)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -111,6 +120,28 @@ def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
 
 
+@app.route('/edit_data', methods=['GET', 'POST'])
+@login_required
+def edit_data():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        address = request.form['address']
+        password = bcrypt.generate_password_hash(request.form['password']).decode('utf-8'),
+        user = current_user
+        if user is None:
+            return redirect(url_for('login'))
+        else:
+            user.username = username
+            user.email = email
+            user.password = password
+            user.address = address
+            db.session.commit()
+            return redirect(url_for('dashboard'))
+    else:
+        return render_template('edit_data.html')
+
+
 @app.route('/add_product', methods=['GET', 'POST'])
 @login_required
 def add_product():
@@ -142,11 +173,18 @@ def create_post():
         title = request.form['title']
         description = request.form['description']
         price = request.form['price']
-        image_url = request.form['image_url']
+        # image_url = request.form['image_url']
         start_date = datetime.now()
         end_date = start_date + timedelta(days=30)
         id_product = request.form['id_product']
         user = current_user
+        product = Product.query.filter_by(id_product=id_product).first()
+        if product is None:
+            flash('This product does not exist.')
+            return redirect(url_for('create_post'))
+        if product.id_user != user.id_user:
+            flash('This product does not belong to you.')
+            return redirect(url_for('create_post'))
         if user is None:
             return redirect(url_for('login'))
         else:
@@ -194,10 +232,6 @@ def posts():
 def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
-    # if request.method == 'POST':
-    #     message = request.form['message']
-    #     owner_username = request.form['owner_username']
-    #     socketio.emit('direct_message', {'message': message, 'ownerUsername': owner_username})
     return render_template('post.html', post=post)
 
 
@@ -227,57 +261,147 @@ def buy_product(id_post):
         return redirect(url_for('get_post', post_id=id_post))
 
 
-@app.route('/message')
+######Auction######
+@app.route('/auctions/create', methods=['GET', 'POST'])
 @login_required
-def message():
-    return render_template('message.html', username=current_user.username)
+def create_auction():
+    if request.method == 'POST':
+        id_user = current_user.id_user
+        title = request.form['title']
+        starting_price = request.form['starting_price']
+        start_date = request.form['start_date']
+        end_date = request.form['end_date']
+        id_product = request.form['id_product']
+        description = request.form['description']
+        if start_date > end_date:
+            flash('The start date must be before the end date!', 'warning')
+            return redirect(url_for('create_auction'))
+        if start_date < datetime.now():
+            flash('The start date must be in the future!', 'warning')
+            return redirect(url_for('create_auction'))
+        if end_date < datetime.now():
+            flash('The end date must be in the future!', 'warning')
+            return redirect(url_for('create_auction'))
+        if starting_price < 0:
+            flash('The price must be positive!', 'warning')
+            return redirect(url_for('create_auction'))
+        product = Product.qeur.filter_by(id_product=id_product).first()
+        if product is None:
+            flash('This product does not exist.')
+            return redirect(url_for('create_auction'))
+        if product.id_user != id_user:
+            flash('This product does not belong to you.')
+            return redirect(url_for('create_auction'))
+
+        auction = Auction(description=description, title=title, id_user=id_user, starting_price=starting_price,
+                          curent_price=starting_price,
+                          start_date=start_date, end_date=end_date, id_product=id_product)
+        db.session.add(auction)
+        db.session.commit()
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('create_auction.html', datetime=datetime)
 
 
-@app.route('/')
-def home():
-    return render_template("index.html")
+@app.route('/auctions', methods=['GET'])
+def auctions():
+    auctions = Auction.query.all()
+    if auctions is None:
+        flash('There are no auctions.')
+        return redirect(url_for('index'))
+    return render_template('auctions.html', auctions=auctions)
 
 
-from flask import request, jsonify
-from flask_socketio import emit
+@app.route('/auctions/<int:id_auction>', methods=['GET'])
+def get_auction(id_auction):
+    auction = Auction.query.get_or_404(id_auction)
+    return render_template('auction.html', auction=auction, id_auction=id_auction)
 
 
-#
-# @app.route('/send_message', methods=['POST'])
-# def send_message():
-#     message = request.json['message']
-#     post_id = request.json['post_id']
-#     user_id = request.json['user_id']
-#
-#     # Send email message to post owner using SendGrid or another email provider
-#     # ...
-#
-#     return jsonify({'success': True})
-#
-#
-# @app.route('/receive_message', methods=['POST'])
-# def receive_message():
-#     message = request.json['message']
-#     post_id = request.json['post_id']
-#     user_id = request.json['user_id']
-#
-#     emit('message_received', {'message': message, 'user_id': user_id}, room=post_id)
-#
-#     return jsonify({'success': True})
-
-#######################################################
-@socketio.on('join')
-def handle_join(data):
-    room = data['post_id']
-    join_room(room)
+@app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
+def create_bid(id_auction):
+    return render_template('create_bid.html', id_auction=id_auction)
 
 
-# @socketio.on('send_message')
-# def handle_send_message(data):
-#     emit('receive_message', data, room=data['post_id'])
+@app.route('/auctions/<int:auction_id>/add_bid', methods=['POST', 'GET'])
+@login_required
+def add_bid(auction_id):
+    if request.method == 'POST':
+        auction = Auction.query.get_or_404(auction_id)
+        product = Product.query.get_or_404(auction.id_product)
+        if auction.id_user == current_user.id_user:
+            flash('You cannot bid on your own product!', 'warning')
+            return redirect(url_for('get_auction', id_auction=auction_id))
+        elif auction.status == 'closed':
+            flash('This product is already sold!', 'warning')
+            return redirect(url_for('get_auction', id_auction=auction_id))
+        else:
+            id_user = current_user.id_user
+            price = request.form['price']
+            bid = Bid(id_user=id_user, price=price, id_auction=auction_id)
+            db.session.add(bid)
+            if int(price) > int(auction.curent_price):
+                auction.curent_price = bid.price
+                auction.winner_id = bid.id_user
+                db.session.commit()
+                flash('You have successfully bid on the product!', 'success')
+                return redirect(url_for('auctions'))
+            else:
+                flash('Your bid is lower than the current price!', 'warning')
+                return redirect(url_for('get_auction', id_auction=auction_id))
+    else:
+        return redirect(url_for('add_bid', auction_id=auction_id))
 
-#######################################################
 
+@app.route('/auctions/<int:auction_id>/close', methods=['POST', 'GET'])
+@login_required
+def close_auction(auction_id):
+    if request.method == 'POST':
+        auction = Auction.query.get_or_404(auction_id)
+        product = Product.query.get_or_404(auction.id_product)
+        if auction.id_user == current_user.id_user:
+            auction.status = 'closed'
+            product.id_user = auction.winner_id
+            transaction = Transaction(buyer_id=auction.winner_id, seller_id=auction.id_user,
+                                      product_id=auction.id_product,
+                                      price=auction.curent_price)
+            db.session.add(transaction)
+            db.session.commit()
+            flash('You have successfully closed the auction!', 'success')
+            return redirect(url_for('auctions'))
+        else:
+            flash('You cannot close this auction!', 'warning')
+            return redirect(url_for('get_auction', auction_id=auction_id))
+    else:
+        return redirect(url_for('get_auction', auction_id=auction_id))
+
+
+def encrypt(text):
+    swapped_text = ''
+    for i in range(0, len(text), 5):
+        chunk = text[i:i + 5]
+        if len(chunk) == 5:
+            swapped_chunk = chr(ord(chunk[0]) + i) + chunk[3] + chunk[2] + chunk[1] + chunk[4]
+            swapped_text += swapped_chunk
+        else:
+            swapped_text += chunk
+
+    return swapped_text
+
+
+def decrypt(text):
+    original_text = ''
+    for i in range(0, len(text), 5):
+        chunk = text[i:i + 5]
+        if len(chunk) == 5:
+            original_chunk = chr(ord(chunk[0]) - i) + chunk[3] + chunk[2] + chunk[1] + chunk[4]
+            original_text += original_chunk
+        else:
+            original_text += chunk
+
+    return original_text
+
+# Functie pentru trimis mesaje
 @app.route('/send_message', methods=['GET', 'POST'])
 @login_required
 def send_message():
@@ -286,7 +410,7 @@ def send_message():
         sender_id = current_user.id_user
         receiver_id = request.form['receiver_id']
         message_text = request.form['message_text']
-
+        message_text = encrypt(message_text)
         # Validate request data
         if not receiver_id or not message_text:
             return 'Toate câmpurile sunt obligatorii!', 400
@@ -314,35 +438,14 @@ def send_message():
 @app.route('/messages', methods=['POST', 'GET'])
 @login_required
 def messages():
+
     # Obtine utilizatorul curent
     user = current_user
 
     # Obține mesajele primite
     received_messages = Message.query.filter_by(receiver_id=user.id_user).all()
-
     # Obține mesajele trimise
     sent_messages = Message.query.filter_by(sender_id=user.id_user).all()
-
-    # Creeaza un dictionar cu toate mesajele grupate dupa utilizatorul corespondent
-    # messages_dict = {}
-    # for message in received_messages:
-    #     if message.sender_id not in messages_dict:
-    #         messages_dict[sender.username] = {'username': sender.username, 'messages': [message.message_text]}
-    #     else:
-    #         messages_dict[sender.username]['messages'].append(message.message_text)
-    #
-    # for message in sent_messages:
-    #     receiver = User.query.filter_by(id_user=message.receiver_id).first()
-    #     if message.receiver_id not in messages_dict:
-    #         messages_dict[receiver.username] = {'username': receiver.username, 'messages': [message.message_text]}
-    #     else:
-    #         messages_dict[receiver.username]['messages'].append(message.message_text)
-
-    # Rendereaza pagina html cu mesajele
-
-    # Cum o sa fac:
-    # O sa adun toata conversatia cu cineva si ii pun ca cheie id-ul persoanei careia i-a fost trimis un mesaj
-    # O sa le ordonez dupa data ca sa fie aranjate frumos
 
     mesaje_dict = {}
 
@@ -350,6 +453,7 @@ def messages():
     # ele au sender id-ul meu
     # o sa aiba si reciever id-ul persoanei cu care m-am conversat
     for mesaj in sent_messages:
+        mesaj.message_text = decrypt(mesaj.message_text)
         receiver = User.query.filter_by(id_user=mesaj.receiver_id).first()
         if receiver.username not in mesaje_dict:
             mesaje_dict[receiver.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
@@ -360,6 +464,7 @@ def messages():
     # Ne trebuie mesajele pe care le-am primit
 
     for mesaj in received_messages:
+        mesaj.message_text = decrypt(mesaj.message_text)
         sender = User.query.filter_by(id_user=mesaj.sender_id).first()
         if sender.username not in mesaje_dict:
             mesaje_dict[sender.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
@@ -371,30 +476,9 @@ def messages():
     return render_template('view_messages.html', messages=sorted_dict)
 
 
-#
-# @app.route('/view_messages')
-# @login_required
-# def view_message():
-#     id_us = current_user.id_user
-#     messages = Message.query.filter_by(receiver_id=id_us).all()
-#     messages += Message.query.filter_by(sender_id=id_us).all()
-#     # s_name =
-#     # nume sender
-#     user = User.query.filter_by(id_user=id_us).first()
-#     r_name = user.username if user else None
-#     # nume receiver
-#
-#     return render_template('view_messages.html', reciever=r_name, messages=messages)
-
-
-@app.route('/view_messages/<int:sender_id>/<int:receiver_id>')
-def messages_pers(sender_id, receiver_id):
-    sender_id = current_user.id_user
-    sender = User.query.get(sender_id)
-    receiver = User.query.get(receiver_id)
-    messages = Message.query.filter_by(receiver_id=receiver_id).all()
-
-    return render_template('view_messages.html', sender=sender, receiver=receiver, messages=messages)
+@app.route('/')
+def home():
+    return render_template("index.html")
 
 
 if __name__ == '__main__':
