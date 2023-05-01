@@ -21,6 +21,12 @@ bcrypt = Bcrypt()
 socketio = SocketIO(app)
 
 
+@app.errorhandler(ConnectionError)
+def handle_connection_error(error):
+    flash('Email-ul este deja folosit!')
+    return redirect(request.referrer or url_for('/register'))
+
+
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
         InputRequired(), Length(min=4, max=30)], render_kw={"placeholder": "Username"})
@@ -41,6 +47,13 @@ class RegisterForm(FlaskForm):
         if existing_user_username:
             raise ValidationError(
                 'That username already exists. Please choose a different one.')
+
+    def validate_email(self, address):
+        existing_user_address = User.query.filter_by(
+            address=address.data).first()
+        if existing_user_address:
+            raise ValidationError(
+                'That email address already exists. Please choose a different one.')
 
 
 class LoginForm(FlaskForm):
@@ -401,6 +414,7 @@ def decrypt(text):
 
     return original_text
 
+
 # Functie pentru trimis mesaje
 @app.route('/send_message', methods=['GET', 'POST'])
 @login_required
@@ -438,7 +452,6 @@ def send_message():
 @app.route('/messages', methods=['POST', 'GET'])
 @login_required
 def messages():
-
     # Obtine utilizatorul curent
     user = current_user
 
