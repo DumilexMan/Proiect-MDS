@@ -324,7 +324,7 @@ def create_auction():
         if int(starting_price) < 0:
             flash('The price must be positive!', 'warning')
             return redirect(url_for('create_auction'))
-        product = Product.qeury.filter_by(id_product=id_product).first()
+        product = Product.query.filter_by(id_product=id_product).first()
         if product is None:
             flash('This product does not exist.')
             return redirect(url_for('create_auction'))
