@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+</head>
+<body>
+  <link rel="stylesheet" type="text/css" href="./dashboard.css" />
+  <div class="window">
+    <div class="window-panel">
+      <ul class="tree">
+        <li class="tree-branch">
+          <div class="tree-branch-action">
+            <a href="#section1" class="tree-branch-link">Posts owned by you</a>
+          </div>
+        </li>
+        <li class="tree-branch">
+          <div class="tree-branch-action">
+            <a href="#section2" class="tree-branch-link">Products owned by you</a>
+          </div>
+        </li>
+        <li class="tree-branch">
+          <div class="tree-branch-action">
+            <a href="#section3" class="tree-branch-link">Auctions posted by you</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="window-main">
+      <div class="editor">
+        <div class="login">
+          <h1>Welcome, {{ current_user.username }}!</h1>
+          <p>Your email is {{ current_user.email }}.</p>
+          <p>Your name is {{ current_user.name }}.</p>
+          <p>Your address is {{ current_user.address }}.</p>
+          <a href="{{ url_for('logout') }}">Logout</a>
+          <a href="{{ url_for('edit_data') }}">Edit</a>
+        </div>
+        <br>
+        <div class="section1" id="section1">
+          <h1>Posts owned by you</h1>
+          <ul>
+            {% for post in posts %}
+            <li>
+              <h2>{{ post.title }}</h2>
+              <p>{{ post.description }}</p>
+              <p>Price: {{ post.price }}</p>
+              <p>Status: {{ post.status }}</p>
+              <a href="{{ url_for('get_post', post_id=post.id_post) }}">Access post</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="section2" id="section2">
+          <h1>Products owned by you</h1>
+          <ul>
+            {% for product in products %}
+            <li>
+              <h2>{{ product.name }}</h2>
+              <p>ID: {{ product.id_product }}</p>
+              <p>Value: {{ product.price }}</p>
+              <p>Category: {{ product.category }}</p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="section3" id="section3">
+          <h1>Auctions started by you</h1>
+          <ul>
+            {% for auction in auctions %}
+            <li>
+              <h2>{{ auction.title }}</h2>
+              <p>ID: {{ auction.id_auction }}</p>
+              <p>Starting price: {{ auction.starting_price }}</p>
+              <p>Current price: {{ auction.curent_price }}</p>
+              <p>Start date: {{ auction.start_date }}</p>
+              <p>End date: {{ auction.end_date }}</p>
+              <p>Status: {{ auction.status }}</p>
+              <p>Winner_id: {{ auction.winner_id }}</p>
+              <p>description: {{ auction.description }}</p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+    </div>
+  </div>
+</body>
+
+</html>
