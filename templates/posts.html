@@ -3,6 +3,11 @@
 <head>
     <title>All Posts</title>
 </head>
+
+<script>
+
+
+</script>
 <body>
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -25,5 +30,20 @@
         </li>
         {% endfor %}
     </ul>
+ <label for="option">Produse in functie de categorie</label>
+     <select id="option">
+  <option value="electronice">Electronice</option>
+  <option value="imbracaminte">Imbracaminte</option>
+  <option value="jucarii">Jucarii</option>
+  <option value="carti">Carti</option>
+  <option value="altele">Altele</option>
+</select>
+<label for="option">Produse in functie de pret</label>
+     <select id="option">
+  <option value="crescator">Crescator</option>
+  <option value="descrescator">Descrescator</option>
+</select>
+<button >Filtreaza</button>
+
 </body>
 </html>

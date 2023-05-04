@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Informatii</title>
+</head>
+<body>
+{% block content %}
+<div class="container">
+  <h2>Questions and Answers</h2>
+  <hr>
+  {% for question_text, answears in intrebari_raspunsuri.items() %}
+  <div class="question">
+    <h4>{{ question_text }}</h4>
+    {% if intrebari_raspunsuri[question_text] %}
+    <ul>
+      {% for answer_text in intrebari_raspunsuri[question_text] %}
+      <li>{{ answer_text }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No answers yet</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+</body>
+</html>

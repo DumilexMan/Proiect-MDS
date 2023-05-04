@@ -7,7 +7,7 @@ from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:mirceapetcu@localhost/mds_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/test'
 app.secret_key = "proiect_Scolar"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.permanent_session_lifetime = timedelta(hours=1)
@@ -74,6 +74,17 @@ class Auction(db.Model):
     title = db.Column(db.String(100),nullable=False)
     description = db.Column(db.Text,nullable=False)
 
+class Question(db.Model):
+    __tablename__ = 'questions'
+    id_question = db.Column(db.Integer, primary_key = True)
+    question_text = db.Column(db.String(1000), nullable=False)
+    question_time = db.Column(db.DateTime, default=datetime.utcnow)
+class Answer(db.Model):
+ __tablename__ = 'answers'
+ id_answer = db.Column(db.Integer, primary_key = True)
+ answer_text = db.Column(db.String(1000), nullable=False)
+ answer_time = db.Column(db.DateTime, default=datetime.utcnow)
+ id_question = db.Column(db.Integer, db.ForeignKey('questions.id_question'), nullable=False)
 class Bid(db.Model):
     __tablename__ = 'bids'
     id_bid = db.Column(db.Integer, primary_key = True)
