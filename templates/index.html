@@ -1,20 +1,58 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+
 </head>
 <body>
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
-<div><h1>Home Page</h1></div>
+    <link rel="stylesheet" type="text/css" href="../static/index.css" />
+    <div class="box-form">
+        <div class="left">
+            <div class="overlay">
+                <h1>Licitatii Web Site</h1>
+            </div>
+        </div>
+
+        <div class="right">
+            <h5>Home Page</h5>
+                <button id="button" onclick="window.location.href='messages'">Go to Messages</button>
+                <br>
+                <h1>Meniu:</h1>
+                <br>
+                <a href="add_product">add_product</a>
+                <br>
+                <a href="auctions#int:id_auction">auction</a>
+                <br>
+                <a href="auctions">auctions</a>
+                <br>
+                <a href="auctions/create">create_auction</a>
+                <br>
+                <a href="auctions#id_auction/create_bid">create_bid</a>
+                <br>
+                <a href="create_post">create_post</a>
+                <br>
+                <a href="dashboard">dashboard</a>
+                <br>
+                <a href="edit_data">edit_data</a>
+                <br>
+                <a href="login">login</a>
+                <br>
+                <a href="posts#id_post">post</a>
+                <br>
+                <a href="posts">posts</a>
+                <br>
+                <a href="register">register</a>
+                <br>
+                <a href="send_message">send_message</a>
+                <br>
+                <a href="messages">view_messages</a>
+                <br>
+                <a href="view_questions">view_questions</a>
+            </div>
+    </div>
+    <br><br>
 </body>
 </html>
