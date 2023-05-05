@@ -198,6 +198,9 @@ def create_post():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
+        if check_for_drugs(description):
+            flash('This product does not conform with our terms and conditions.')
+            return redirect(url_for('create_post'))
         price = request.form['price']
         # image_url = request.form['image_url']
         start_date = datetime.now()
@@ -288,7 +291,8 @@ def posts_filter_by_date(date):
 def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', post=post)
+    nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
+    return render_template('post.html', post=post, nume=nume_proprietar)
 
 
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
@@ -610,6 +614,44 @@ def messages():
         sorted_dict[key]['messages'] = sorted(mesaje_dict[key]['messages'], key=lambda x: x['time'])
 
     return render_template('view_messages.html', messages=sorted_dict)
+
+
+@app.route('/send_message_post', methods=['GET', 'POST'])
+@login_required
+def send_message_post():
+    # Parse request data
+
+    if request.method == 'POST':
+        sender_id = current_user.id_user
+        receiver_name = request.form['receiver_name']
+        receiver_id = User.query.filter_by(username=receiver_name).first()
+        if receiver_id is None:
+            flash('Nume gresit')
+            return redirect(url_for('send_message'))
+
+        receiver_id = receiver_id.id_user
+        message_text = request.form['message_text']
+        message_text = encrypt(message_text)
+        # Validate request data
+        if not receiver_id or not message_text:
+            return 'Toate câmpurile sunt obligatorii!', 400
+
+        # Create a new message
+        new_message = Message(sender_id=sender_id,
+                              receiver_id=receiver_id,
+                              message_text=message_text)
+
+        # Add message to database
+        db.session.add(new_message)
+        db.session.commit()
+
+        # Return success message
+        flash('Mesajul a fost trimis cu succes!', 'success')
+        return redirect(url_for('send_message_post'))
+
+    else:
+        nume = request.args.get('nume')
+        return render_template('send_message_post.html', nume=nume)
 
 
 @app.route('/')

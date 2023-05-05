@@ -23,10 +23,19 @@
     <p>Status: {{ post.status }}</p>
     <p>Star Date: {{ post.start_date }}</p>
     <p>End Date: {{ post.end_date }}</p>
+    <p>Vanzator: {{ nume }}</p>
     <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
         <button type="submit">Cumpara</button>
     </form>
-     <button onclick="showMessageModal()">Trimiteți un mesaj către proprietar</button>
+
+    <script>
+    function sendMessage(nume) {
+        var url = '/send_message_post?nume=' + encodeURIComponent(nume);
+        window.location.href = url;
+    }
+</script>
+
+<button onclick="sendMessage('{{ nume }}')">Trimiteți un mesaj către proprietar</button>
 
     <div id="message-modal" style="display: none;">
         <form onsubmit="sendMessage(); return false;">
@@ -39,23 +48,6 @@
 
 {#    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>#}
 {#    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js" integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA==" crossorigin="anonymous"></script>#}
-    <script>
-        var socket = io.connect();
 
-        function showMessageModal() {
-            $('#message-modal').show();
-        }
-
-        function sendMessage() {
-            var message = $('#message').val();
-                socket.emit('send_message', { message: message, post_id: "{{ post.id_post }}", user_id: "{{ current_user.id }}" });
-            $('#message-modal').hide();
-            alert('Mesajul dvs. a fost trimis!');
-        }
-
-        socket.on('message_received', function(data) {
-            alert('Ați primit un nou mesaj de la utilizatorul cu ID-ul ' + data.user_id + ': ' + data.message);
-        });
-    </script>
 </body>
 </html>
