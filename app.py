@@ -1,5 +1,5 @@
 # import socketio
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from models import app, db, User, Product, Post, Auction, Transaction, Bid, Message, Question, Answer
 import hashlib
@@ -155,11 +155,24 @@ def edit_data():
         return render_template('edit_data.html')
 
 
+def check_for_drugs(text):
+    drug_names = ['marijuana', 'cocaine', 'heroin', 'ecstasy', 'lsd', 'methamphetamine', 'crystal meth', 'pcp',
+                  'ketamine']
+    for drug in drug_names:
+        if drug in text.lower():
+            return True
+    return False
+
+
 @app.route('/add_product', methods=['GET', 'POST'])
 @login_required
 def add_product():
     if request.method == 'POST':
         name = request.form['name']
+        if check_for_drugs(name):
+            flash('This product does not conform with our terms and conditions.')
+            return redirect(url_for('add_product'))
+
         price = request.form['price']
         category = request.form['category']
         user = current_user
@@ -240,19 +253,24 @@ def posts():
     posts = Post.query.all()
     return render_template('posts.html', posts=posts)
 
+
 @app.route('/posts_filter_by_category/<string:category>')
 def posts_filter_by_category(category):
     posts = Post.query.filter_by(category=category).all()
     return render_template('posts.html', posts=posts)
 
+
 @app.route('/posts_filter_by_price/<int:lower_price>/<int:upper_price>')
 def posts_filter_by_price(lower_price, upper_price):
     posts = Post.query.filter(Post.price >= lower_price, Post.price <= upper_price).all()
     return render_template('posts.html', posts=posts, lower_price=lower_price, upper_price=upper_price)
+
+
 @app.route('/posts_filter_descending_by_price')
 def posts_filter_descending_by_price():
     posts = Post.query.order_by(Post.price.desc()).all()
     return render_template('posts.html', posts=posts)
+
 
 @app.route('/posts_filter_ascending_by_price')
 def posts_filter_ascending_by_price():
@@ -265,13 +283,12 @@ def posts_filter_by_date(date):
     posts = Post.query.filter(Post.start_date <= date, Post.end_date >= date).all()
     return render_template('posts.html', posts=posts)
 
+
 @app.route('/posts/<int:post_id>', methods=['POST', 'GET'])
 def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
     return render_template('post.html', post=post)
-
-
 
 
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
@@ -370,10 +387,12 @@ def auctions_order_by_end_date():
 
     return render_template('auctions.html', auctions=auctions)
 
+
 @app.route('/auctions_ordered_descending_by_current_price')
 def auctions_order_by_current_price():
     auctions = Auction.query.order_by(Auction.curent_price.desc()).all()
     return render_template('auctions.html', auctions=auctions)
+
 
 @app.route('/auctions_with_status_open')
 def auctions_with_status_open():
@@ -383,6 +402,7 @@ def auctions_with_status_open():
         return redirect(url_for('index'))
     return render_template('auctions.html', auctions=auctions)
 
+
 @app.route('/auctions_with_status_closed')
 def auctions_with_status_closed():
     auctions = Auction.query.filter_by(status='closed').all()
@@ -391,15 +411,14 @@ def auctions_with_status_closed():
         return redirect(url_for('index'))
     return render_template('auctions.html', auctions=auctions)
 
+
 @app.route('/auctions_with_status_open_with_current_price_between<int:price1>/<int:price2>')
 def auctions_with_status_open_with_current_price_between(price1, price2):
     if price1 > price2:
         flash('The lower price must be lower than the upper price!', 'warning')
         return redirect(url_for('auctions'))
     auctions = Auction.query.filter(Auction.status == 'open', Auction.curent_price.between(price1, price2)).all()
-    return render_template('auctions.html', auctions=auctions,lower_price=price1, upper_price=price2)
-
-
+    return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2)
 
 
 @app.route('/auctions/<int:id_auction>', methods=['GET'])
@@ -492,23 +511,18 @@ def decrypt(text):
     return original_text
 
 
-@app.route('/view_questions',methods=['GET','POST'])
+@app.route('/view_questions', methods=['GET', 'POST'])
 def questions():
-    dict={}
+    dict = {}
     questions = Question.query.all()
     for question in questions:
-        raspunsuri=Answer.query.filter_by(id_question=question.id_question)
+        raspunsuri = Answer.query.filter_by(id_question=question.id_question)
         for raspuns in raspunsuri:
             if question.question_text not in dict:
-                dict[question.question_text]=[raspuns.answer_text]
+                dict[question.question_text] = [raspuns.answer_text]
             else:
                 dict[question.question_text].append(raspuns.answer_text)
-    return render_template('view_questions.html',intrebari_raspunsuri=dict)
-
-
-
-
-
+    return render_template('view_questions.html', intrebari_raspunsuri=dict)
 
 
 # Functie pentru trimis mesaje
@@ -518,7 +532,13 @@ def send_message():
     # Parse request data
     if request.method == 'POST':
         sender_id = current_user.id_user
-        receiver_id = request.form['receiver_id']
+        receiver_name = request.form['receiver_name']
+        receiver_id = User.query.filter_by(username=receiver_name).first()
+        if receiver_id is None:
+            flash('Nume gresit')
+            return redirect(url_for('send_message'))
+
+        receiver_id = receiver_id.id_user
         message_text = request.form['message_text']
         message_text = encrypt(message_text)
         # Validate request data
@@ -565,9 +585,11 @@ def messages():
         mesaj.message_text = decrypt(mesaj.message_text)
         receiver = User.query.filter_by(id_user=mesaj.receiver_id).first()
         if receiver.username not in mesaje_dict:
-            mesaje_dict[receiver.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
+            mesaje_dict[receiver.username] = {
+                'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time, 's/r': 's'}]}
         else:
-            mesaje_dict[receiver.username]['messages'].append({'text': mesaj.message_text, 'time': mesaj.message_time})
+            mesaje_dict[receiver.username]['messages'].append(
+                {'text': mesaj.message_text, 'time': mesaj.message_time, 's/r': 's'})
 
     # Acum avem toate mesajele pe care le-am trimis
     # Ne trebuie mesajele pe care le-am primit
@@ -576,11 +598,16 @@ def messages():
         mesaj.message_text = decrypt(mesaj.message_text)
         sender = User.query.filter_by(id_user=mesaj.sender_id).first()
         if sender.username not in mesaje_dict:
-            mesaje_dict[sender.username] = {'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time}]}
+            mesaje_dict[sender.username] = {
+                'messages': [{'text': mesaj.message_text, 'time': mesaj.message_time, 's/r': 'r'}]}
         else:
-            mesaje_dict[sender.username]['messages'].append({'text': mesaj.message_text, 'time': mesaj.message_time})
+            mesaje_dict[sender.username]['messages'].append(
+                {'text': mesaj.message_text, 'time': mesaj.message_time, 's/r': 'r'})
 
     sorted_dict = dict(sorted(mesaje_dict.items(), key=lambda x: x[1]['messages'][-1]['time']))
+
+    for key in mesaje_dict.keys():
+        sorted_dict[key]['messages'] = sorted(mesaje_dict[key]['messages'], key=lambda x: x['time'])
 
     return render_template('view_messages.html', messages=sorted_dict)
 
