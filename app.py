@@ -336,7 +336,7 @@ def create_auction():
         if start_date > end_date:
             flash('The start date must be before the end date!', 'warning')
             return redirect(url_for('create_auction'))
-        if datetime.strptime(start_date, '%Y-%m-%dT%H:%M')< datetime.now():
+        if datetime.strptime(start_date, '%Y-%m-%dT%H:%M') < datetime.now():
             flash('The start date must be in the future!', 'warning')
             return redirect(url_for('create_auction'))
         if datetime.strptime(end_date, '%Y-%m-%dT%H:%M') < datetime.now():
@@ -400,7 +400,7 @@ def auctions_order_by_current_price():
 
 @app.route('/auctions_with_status_open')
 def auctions_with_status_open():
-    auctions = Auction.query.filter_by(status='open').all()
+    auctions = Auction.query.filter_by(status='active').all()
     if auctions is None:
         flash('There are no auctions.')
         return redirect(url_for('index'))
@@ -421,7 +421,9 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
     if price1 > price2:
         flash('The lower price must be lower than the upper price!', 'warning')
         return redirect(url_for('auctions'))
-    auctions = Auction.query.filter(Auction.status == 'open', Auction.curent_price.between(price1, price2)).all()
+    auctions = Auction.query.filter(Auction.status == 'active',
+                                         Auction.curent_price >= price1,
+                                         Auction.curent_price <= price2).all()
     return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2)
 
 
@@ -515,24 +517,22 @@ def decrypt(text):
     return original_text
 
 
-@app.route('/view_questions',methods=['GET','POST'])
+@app.route('/view_questions', methods=['GET', 'POST'])
 def questions():
-    #Adauga intrebare
-    if request.method== 'POST':
+    # Adauga intrebare
+    if request.method == 'POST':
         if 'Intrebare_Submit' in request.form:
 
-            question_text=request.form['question_text']
+            question_text = request.form['question_text']
             if not question_text:
                 return 'Toate câmpurile sunt obligatorii!', 400
-            question=Question(question_text=question_text)
+            question = Question(question_text=question_text)
             db.session.add(question)
             db.session.commit()
-            flash('Intrebarea a fost adaugata cu succes!','success')
+            flash('Intrebarea a fost adaugata cu succes!', 'success')
             return redirect(url_for('questions'))
 
-
-
-    dict={}
+    dict = {}
     questions = Question.query.all()
     for question in questions:
         if request.method == 'POST':
@@ -547,14 +547,11 @@ def questions():
                 db.session.commit()
                 flash('Raspunsul a fost adaugat cu succes!', 'success')
                 return redirect(url_for('questions'))
-        dict[(question.id_question,question.question_text)]=[]
-        raspunsuri=Answer.query.filter_by(id_question=question.id_question)
+        dict[(question.id_question, question.question_text)] = []
+        raspunsuri = Answer.query.filter_by(id_question=question.id_question)
         for raspuns in raspunsuri:
-                dict[(question.id_question,question.question_text)].append(raspuns.answer_text)
-    return render_template('view_questions.html',intrebari_raspunsuri=dict)
-
-
-
+            dict[(question.id_question, question.question_text)].append(raspuns.answer_text)
+    return render_template('view_questions.html', intrebari_raspunsuri=dict)
 
 
 # Functie pentru trimis mesaje
