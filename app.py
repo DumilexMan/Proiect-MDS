@@ -336,10 +336,10 @@ def create_auction():
         if start_date > end_date:
             flash('The start date must be before the end date!', 'warning')
             return redirect(url_for('create_auction'))
-        if start_date < datetime.now():
+        if datetime.strptime(start_date, '%Y-%m-%dT%H:%M')< datetime.now():
             flash('The start date must be in the future!', 'warning')
             return redirect(url_for('create_auction'))
-        if end_date < datetime.now():
+        if datetime.strptime(end_date, '%Y-%m-%dT%H:%M') < datetime.now():
             flash('The end date must be in the future!', 'warning')
             return redirect(url_for('create_auction'))
         if int(starting_price) < 0:
@@ -515,18 +515,46 @@ def decrypt(text):
     return original_text
 
 
-@app.route('/view_questions', methods=['GET', 'POST'])
+@app.route('/view_questions',methods=['GET','POST'])
 def questions():
-    dict = {}
+    #Adauga intrebare
+    if request.method== 'POST':
+        if 'Intrebare_Submit' in request.form:
+
+            question_text=request.form['question_text']
+            if not question_text:
+                return 'Toate câmpurile sunt obligatorii!', 400
+            question=Question(question_text=question_text)
+            db.session.add(question)
+            db.session.commit()
+            flash('Intrebarea a fost adaugata cu succes!','success')
+            return redirect(url_for('questions'))
+
+
+
+    dict={}
     questions = Question.query.all()
     for question in questions:
-        raspunsuri = Answer.query.filter_by(id_question=question.id_question)
+        if request.method == 'POST':
+
+            submit_name = "Raspuns" + str(question.id_question)
+            if submit_name in request.form:
+                answer_text = request.form["answer" + str(question.id_question)]
+                if not answer_text:
+                    return 'Toate câmpurile sunt obligatorii!', 400
+                answer = Answer(answer_text=answer_text, id_question=question.id_question)
+                db.session.add(answer)
+                db.session.commit()
+                flash('Raspunsul a fost adaugat cu succes!', 'success')
+                return redirect(url_for('questions'))
+        dict[(question.id_question,question.question_text)]=[]
+        raspunsuri=Answer.query.filter_by(id_question=question.id_question)
         for raspuns in raspunsuri:
-            if question.question_text not in dict:
-                dict[question.question_text] = [raspuns.answer_text]
-            else:
-                dict[question.question_text].append(raspuns.answer_text)
-    return render_template('view_questions.html', intrebari_raspunsuri=dict)
+                dict[(question.id_question,question.question_text)].append(raspuns.answer_text)
+    return render_template('view_questions.html',intrebari_raspunsuri=dict)
+
+
+
 
 
 # Functie pentru trimis mesaje
