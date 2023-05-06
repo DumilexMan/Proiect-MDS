@@ -4,16 +4,27 @@
     <title>Informatii</title>
 </head>
 <body>
+<form action=""  method="post">
+        <label>Pune Intrebare</label>
+            <textarea name="question_text" rows="5"></textarea><br><br>
+      <input type="submit" name="Intrebare_Submit" value="Trimite">
+    </form>
+
 {% block content %}
 <div class="container">
   <h2>Questions and Answers</h2>
   <hr>
-  {% for question_text, answears in intrebari_raspunsuri.items() %}
+  {% for (question_id,question_text), answears in intrebari_raspunsuri.items() %}
   <div class="question">
     <h4>{{ question_text }}</h4>
-    {% if intrebari_raspunsuri[question_text] %}
+  <form action="" method="post">
+  <label>Raspunde</label>
+  <textarea name={{"answer"}}{{question_id}} rows="5"></textarea><br><br>
+    <input type="submit" name={{"Raspuns"}}{{question_id}} value="Trimite">
+  </form>
+    {% if intrebari_raspunsuri[(question_id,question_text)] %}
     <ul>
-      {% for answer_text in intrebari_raspunsuri[question_text] %}
+      {% for answer_text in intrebari_raspunsuri[(question_id,question_text)] %}
       <li>{{ answer_text }}</li>
       {% endfor %}
     </ul>
@@ -24,6 +35,5 @@
   {% endfor %}
 </div>
 {% endblock %}
-<button id="button" onclick="window.location.href='/'">Home Page</button>
 </body>
 </html>
