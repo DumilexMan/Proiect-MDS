@@ -591,7 +591,6 @@ def questions():
 
 
 
-
 # Functie pentru trimis mesaje
 @app.route('/send_message', methods=['GET', 'POST'])
 @login_required
