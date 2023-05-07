@@ -22,11 +22,13 @@
     <input type="submit" name={{"Delete"}}{{question_id}} value="Sterge">
     </form>
   {% endif %}
+  {% if user_curent.is_authenticated and user_curent.id_user!=question_id %}
   <form action="" method="post">
   <label>Raspunde</label>
   <textarea name={{"answer"}}{{question_id}} rows="5"></textarea><br><br>
     <input type="submit" name={{"Raspuns"}}{{question_id}} value="Trimite">
   </form>
+  {% endif %}
     {% if intrebari_raspunsuri[(question_id,question_text,id_user)] %}
     <ul>
       {% for (answer_text,id_user,answer_id) in intrebari_raspunsuri[(question_id,question_text,id_user)] %}
