@@ -186,7 +186,7 @@ def add_product():
             db.session.commit()
 
             # Redirecționează utilizatorul către pagina de afișare a produselor
-            return redirect(url_for('products'))
+            return redirect(url_for('add_product'))
     else:
         return render_template('add_product.html')
 
