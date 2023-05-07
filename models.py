@@ -59,6 +59,7 @@ class Post(db.Model):
     end_date = db.Column(db.DateTime)
     id_product = db.Column(db.Integer, db.ForeignKey('products.id_product'), nullable=False)
     status = db.Column(Enum('active', 'closed'), nullable=False, default='active')
+    category = db.Column(db.String(100), nullable=False)
 
 class Auction(db.Model):
     __tablename__ = 'auctions'
