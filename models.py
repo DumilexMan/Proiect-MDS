@@ -59,7 +59,6 @@ class Post(db.Model):
     end_date = db.Column(db.DateTime)
     id_product = db.Column(db.Integer, db.ForeignKey('products.id_product'), nullable=False)
     status = db.Column(Enum('active', 'closed'), nullable=False, default='active')
-    category = db.Column(db.String(100), nullable=False)
 
 class Auction(db.Model):
     __tablename__ = 'auctions'
@@ -80,15 +79,12 @@ class Question(db.Model):
     id_question = db.Column(db.Integer, primary_key = True)
     question_text = db.Column(db.String(1000), nullable=False)
     question_time = db.Column(db.DateTime, default=datetime.utcnow)
-    id_user = db.Column(db.Integer, nullable=False)
 class Answer(db.Model):
  __tablename__ = 'answers'
  id_answer = db.Column(db.Integer, primary_key = True)
  answer_text = db.Column(db.String(1000), nullable=False)
  answer_time = db.Column(db.DateTime, default=datetime.utcnow)
  id_question = db.Column(db.Integer, db.ForeignKey('questions.id_question'), nullable=False)
- id_user = db.Column(db.Integer, nullable=False)
-
 class Bid(db.Model):
     __tablename__ = 'bids'
     id_bid = db.Column(db.Integer, primary_key = True)

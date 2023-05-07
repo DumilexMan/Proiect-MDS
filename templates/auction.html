@@ -20,7 +20,6 @@
 <p>Current Bid: {{ auction.status }}</p>
 <form method="GET" action="{{ url_for('create_bid', id_auction=auction.id_auction) }}">
     <button type="submit">Add Bid</button>
-    <button id="button" onclick="window.location.href='/'">Home Page</button>
 </form>
 </body>
 </html>

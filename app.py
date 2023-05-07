@@ -218,7 +218,7 @@ def create_post():
             return redirect(url_for('login'))
         else:
             post = Post(title=title, description=description, id_user=user.id_user, price=price, start_date=start_date,
-                        end_date=end_date, id_product=id_product,category=product.category)
+                        end_date=end_date, id_product=id_product)
             db.session.add(post)
             db.session.commit()
 
@@ -257,17 +257,16 @@ def posts():
     return render_template('posts.html', posts=posts)
 
 
+@app.route('/posts_filter_by_category/<string:category>')
+def posts_filter_by_category(category):
+    posts = Post.query.filter_by(category=category).all()
+    return render_template('posts.html', posts=posts)
+
 
 @app.route('/posts_filter_by_price/<int:lower_price>/<int:upper_price>')
 def posts_filter_by_price(lower_price, upper_price):
     posts = Post.query.filter(Post.price >= lower_price, Post.price <= upper_price).all()
     return render_template('posts.html', posts=posts, lower_price=lower_price, upper_price=upper_price)
-
-
-@app.route('/posts_filter_by_category/<string:category>')
-def posts_filter_by_category(category):
-    posts = Post.query.filter_by(category=category).all()
-    return render_template('posts.html', posts=posts)
 
 
 @app.route('/posts_filter_descending_by_price')
@@ -337,7 +336,7 @@ def create_auction():
         if start_date > end_date:
             flash('The start date must be before the end date!', 'warning')
             return redirect(url_for('create_auction'))
-        if datetime.strptime(start_date, '%Y-%m-%dT%H:%M')< datetime.now():
+        if datetime.strptime(start_date, '%Y-%m-%dT%H:%M') < datetime.now():
             flash('The start date must be in the future!', 'warning')
             return redirect(url_for('create_auction'))
         if datetime.strptime(end_date, '%Y-%m-%dT%H:%M') < datetime.now():
@@ -422,9 +421,9 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
     if price1 > price2:
         flash('The lower price must be lower than the upper price!', 'warning')
         return redirect(url_for('auctions'))
-    auctions = Auction.query.filter((Auction.status == 'active',
+    auctions = Auction.query.filter(Auction.status == 'active',
                                          Auction.curent_price >= price1,
-                                         Auction.curent_price <= price2)).all()
+                                         Auction.curent_price <= price2).all()
     return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2)
 
 
@@ -518,46 +517,24 @@ def decrypt(text):
     return original_text
 
 
-@app.route('/view_questions',methods=['GET','POST'])
+@app.route('/view_questions', methods=['GET', 'POST'])
 def questions():
-
-    #Adauga intrebare
-    if request.method== 'POST':
+    # Adauga intrebare
+    if request.method == 'POST':
         if 'Intrebare_Submit' in request.form:
-            question_text=request.form['question_text']
+
+            question_text = request.form['question_text']
             if not question_text:
                 return 'Toate câmpurile sunt obligatorii!', 400
-            if current_user.is_authenticated:
-                question=Question(question_text=question_text,id_user=current_user.id_user)
-            else:
-                question = Question(question_text=question_text, id_user=0)
+            question = Question(question_text=question_text)
             db.session.add(question)
             db.session.commit()
-            flash('Intrebarea a fost adaugata cu succes!','success')
+            flash('Intrebarea a fost adaugata cu succes!', 'success')
             return redirect(url_for('questions'))
 
-
-
-    dict={}
+    dict = {}
     questions = Question.query.all()
     for question in questions:
-        if request.method == 'POST':
-            if current_user.is_authenticated:
-                delete_name= "Delete" + str(question.id_question)
-                if delete_name in request.form:
-                    if  question.id_user==current_user.id_user:
-                        raspunsuri=Answer.query.filter_by(id_question=question.id_question).all()
-                        for raspuns in raspunsuri:
-                            db.session.delete(raspuns)
-                            db.session.commit()
-                        db.session.commit()
-                        db.session.delete(question)
-                        db.session.commit()
-                        flash('Intrebarea a fost stearsa cu succes!', 'success')
-                        return redirect(url_for('questions'))
-                    else:
-                        return 'Nu puteti sterge intrebarile altor utilizatori!', 400
-
         if request.method == 'POST':
 
             submit_name = "Raspuns" + str(question.id_question)
@@ -565,30 +542,16 @@ def questions():
                 answer_text = request.form["answer" + str(question.id_question)]
                 if not answer_text:
                     return 'Toate câmpurile sunt obligatorii!', 400
-                if current_user.is_authenticated:
-                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=current_user.id_user)
-                else:
-                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=0)
+                answer = Answer(answer_text=answer_text, id_question=question.id_question)
                 db.session.add(answer)
                 db.session.commit()
                 flash('Raspunsul a fost adaugat cu succes!', 'success')
                 return redirect(url_for('questions'))
-        dict[(question.id_question,question.question_text,question.id_user)]=[]
-        raspunsuri=Answer.query.filter_by(id_question=question.id_question)
+        dict[(question.id_question, question.question_text)] = []
+        raspunsuri = Answer.query.filter_by(id_question=question.id_question)
         for raspuns in raspunsuri:
-            if request.method == 'POST':
-                if current_user.is_authenticated and raspuns.id_user==current_user.id_user:
-                    delete_name = "Sterge" + str(raspuns.id_answer)
-                    if delete_name in request.form:
-                        db.session.delete(raspuns)
-                        db.session.commit()
-                        flash('Raspunsul a fost sters cu succes!', 'success')
-                        return redirect(url_for('questions'))
-
-            dict[(question.id_question,question.question_text,question.id_user)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer))
-    return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
-
-
+            dict[(question.id_question, question.question_text)].append(raspuns.answer_text)
+    return render_template('view_questions.html', intrebari_raspunsuri=dict)
 
 
 # Functie pentru trimis mesaje
