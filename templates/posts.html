@@ -24,26 +24,14 @@
         <li>
             <h2>{{ post.title }}</h2>
             <p>{{ post.description }}</p>
+            <p>{{ post.category }}</p>
             <p>Price: {{ post.price }}</p>
             <p>Status: {{ post.status }}</p>
             <a href="{{ url_for('get_post', post_id=post.id_post) }}">Access post</a>
         </li>
         {% endfor %}
     </ul>
- <label for="option">Produse in functie de categorie</label>
-     <select id="option">
-  <option value="electronice">Electronice</option>
-  <option value="imbracaminte">Imbracaminte</option>
-  <option value="jucarii">Jucarii</option>
-  <option value="carti">Carti</option>
-  <option value="altele">Altele</option>
-</select>
-<label for="option">Produse in functie de pret</label>
-     <select id="option">
-  <option value="crescator">Crescator</option>
-  <option value="descrescator">Descrescator</option>
-</select>
-<button >Filtreaza</button>
-<button id="button" onclick="window.location.href='/'">Home Page</button>
+
+
 </body>
 </html>
