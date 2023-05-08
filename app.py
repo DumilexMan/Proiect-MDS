@@ -186,7 +186,7 @@ def add_product():
             db.session.commit()
 
             # Redirecționează utilizatorul către pagina de afișare a produselor
-            return redirect(url_for('products'))
+            return redirect(url_for('add_product'))
     else:
         return render_template('add_product.html')
 
@@ -517,46 +517,24 @@ def decrypt(text):
     return original_text
 
 
-@app.route('/view_questions',methods=['GET','POST'])
+@app.route('/view_questions', methods=['GET', 'POST'])
 def questions():
-
-    #Adauga intrebare
-    if request.method== 'POST':
+    # Adauga intrebare
+    if request.method == 'POST':
         if 'Intrebare_Submit' in request.form:
-            question_text=request.form['question_text']
+
+            question_text = request.form['question_text']
             if not question_text:
                 return 'Toate câmpurile sunt obligatorii!', 400
-            if current_user.is_authenticated:
-                question=Question(question_text=question_text,id_user=current_user.id_user)
-            else:
-                question = Question(question_text=question_text, id_user=0)
+            question = Question(question_text=question_text)
             db.session.add(question)
             db.session.commit()
-            flash('Intrebarea a fost adaugata cu succes!','success')
+            flash('Intrebarea a fost adaugata cu succes!', 'success')
             return redirect(url_for('questions'))
 
-
-
-    dict={}
+    dict = {}
     questions = Question.query.all()
     for question in questions:
-        if request.method == 'POST':
-            if current_user.is_authenticated:
-                delete_name= "Delete" + str(question.id_question)
-                if delete_name in request.form:
-                    if  question.id_user==current_user.id_user:
-                        raspunsuri=Answer.query.filter_by(id_question=question.id_question).all()
-                        for raspuns in raspunsuri:
-                            db.session.delete(raspuns)
-                            db.session.commit()
-                        db.session.commit()
-                        db.session.delete(question)
-                        db.session.commit()
-                        flash('Intrebarea a fost stearsa cu succes!', 'success')
-                        return redirect(url_for('questions'))
-                    else:
-                        return 'Nu puteti sterge intrebarile altor utilizatori!', 400
-
         if request.method == 'POST':
 
             submit_name = "Raspuns" + str(question.id_question)
@@ -564,28 +542,16 @@ def questions():
                 answer_text = request.form["answer" + str(question.id_question)]
                 if not answer_text:
                     return 'Toate câmpurile sunt obligatorii!', 400
-                if current_user.is_authenticated:
-                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=current_user.id_user)
-                else:
-                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=0)
+                answer = Answer(answer_text=answer_text, id_question=question.id_question)
                 db.session.add(answer)
                 db.session.commit()
                 flash('Raspunsul a fost adaugat cu succes!', 'success')
                 return redirect(url_for('questions'))
-        dict[(question.id_question,question.question_text,question.id_user)]=[]
-        raspunsuri=Answer.query.filter_by(id_question=question.id_question)
+        dict[(question.id_question, question.question_text)] = []
+        raspunsuri = Answer.query.filter_by(id_question=question.id_question)
         for raspuns in raspunsuri:
-            if request.method == 'POST':
-                if current_user.is_authenticated and raspuns.id_user==current_user.id_user:
-                    delete_name = "Sterge" + str(raspuns.id_answer)
-                    if delete_name in request.form:
-                        db.session.delete(raspuns)
-                        db.session.commit()
-                        flash('Raspunsul a fost sters cu succes!', 'success')
-                        return redirect(url_for('questions'))
-
-            dict[(question.id_question,question.question_text,question.id_user)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer))
-    return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
+            dict[(question.id_question, question.question_text)].append(raspuns.answer_text)
+    return render_template('view_questions.html', intrebari_raspunsuri=dict)
 
 
 # Functie pentru trimis mesaje

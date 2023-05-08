@@ -1,11 +1,12 @@
+
 {% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul class="flashes">
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endwith %}
 <div class="container mt-4">
     <h1 class="mb-4">Adaugă un produs</h1>
@@ -30,6 +31,5 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Adaugă produsul</button>
-        <button id="button" onclick="window.location.href='/'">Home Page</button>
     </form>
 </div>
