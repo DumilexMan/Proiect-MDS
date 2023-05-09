@@ -10,7 +10,7 @@
 {% endwith %}
 <div class="container mt-4">
     <h1 class="mb-4">Adaugă un produs</h1>
-    <form method="POST" action="{{ url_for('add_product') }}">
+    <form method="POST" action="{{ url_for('add_product') }}" enctype="multipart/form-data">
         <div class="form-group">
             <label for="name">Nume:</label>
             <input type="text" class="form-control" id="name" name="name" required>
@@ -30,6 +30,8 @@
                 <option value="altele">Altele</option>
             </select>
         </div>
+        <input type="file" name="image">
+        <input type="submit" value="Încarcă">
         <button type="submit" class="btn btn-primary">Adaugă produsul</button>
     </form>
 </div>

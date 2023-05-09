@@ -18,8 +18,16 @@
 <p>Starting Bid: {{ auction.starting_bid }}</p>
 <p>Current Bid: {{ auction.curent_bid }}</p>
 <p>Current Bid: {{ auction.status }}</p>
+<img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine">
+<form method="POST" action="{{ url_for('close_auction', auction_id=auction.id_auction) }}">
+    <button type="submit">Close Auction</button></form>
+<form method="POST" action="{{ url_for('open_auction', auction_id=auction.id_auction) }}">
+    <button type="submit">Open Auction</button></form>
+<form method="GET" action="{{ url_for('update_auction', id_auction=auction.id_auction) }}">
+    <button type="submit">Update Auction</button>
+</form>
 <form method="GET" action="{{ url_for('create_bid', id_auction=auction.id_auction) }}">
-    <button type="submit">Add Bid</button>
+    <button type="submit">Add Bid</button></form>
 </form>
 </body>
 </html>
