@@ -1,4 +1,3 @@
-# import socketio
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from models import app, db, User, Product, Post, Auction, Transaction, Bid, Message, Question, Answer
@@ -13,6 +12,7 @@ from flask_bcrypt import Bcrypt
 from flask_socketio import SocketIO, emit
 from flask_socketio import SocketIO, join_room
 from flask_socketio import SocketIO, leave_room
+import base64
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -20,6 +20,11 @@ login_manager.login_view = 'login'
 bcrypt = Bcrypt()
 socketio = SocketIO(app)
 
+@app.template_filter('b64encode')
+def b64encode_filter(data):
+    encoded_bytes = base64.b64encode(data)
+    encoded_string = encoded_bytes.decode('utf-8')
+    return encoded_string
 
 @app.errorhandler(ConnectionError)
 def handle_connection_error(error):
@@ -175,13 +180,14 @@ def add_product():
 
         price = request.form['price']
         category = request.form['category']
+        file = request.files['image']
         user = current_user
         if user is None:
             return redirect(url_for('login'))
         else:
             # Crează un obiect de tipul Product cu datele primite prin POST și salvează-l în baza de date
             product = Product(name=name, price=price, category=category,
-                              id_user=user.id_user)
+                              id_user=user.id_user,image_data=file.read())
             db.session.add(product)
             db.session.commit()
 
@@ -202,10 +208,9 @@ def create_post():
             flash('This product does not conform with our terms and conditions.')
             return redirect(url_for('create_post'))
         price = request.form['price']
-        # image_url = request.form['image_url']
         start_date = datetime.now()
         end_date = start_date + timedelta(days=30)
-        id_product = request.form['id_product']
+        id_product = request.form['product']
         user = current_user
         product = Product.query.filter_by(id_product=id_product).first()
         if product is None:
@@ -224,7 +229,8 @@ def create_post():
 
             return redirect(url_for('posts_ownded_by_user'))
     else:
-        return render_template('create_post.html', datetime=datetime)
+        products = Product.query.filter_by(id_user=current_user.id_user).all()
+        return render_template('create_post.html', datetime=datetime,products = products)
 
 
 @app.route('/products')
@@ -291,8 +297,9 @@ def posts_filter_by_date(date):
 def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
+    product = Product.query.filter_by(id_product=post.id_product).first()
     nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
-    return render_template('post.html', post=post, nume=nume_proprietar)
+    return render_template('post.html', post=post, nume=nume_proprietar,product = product)
 
 
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
@@ -331,7 +338,7 @@ def create_auction():
         starting_price = request.form['starting_price']
         start_date = request.form['start_date']
         end_date = request.form['end_date']
-        id_product = request.form['id_product']
+        id_product = request.form['product']
         description = request.form['description']
         if start_date > end_date:
             flash('The start date must be before the end date!', 'warning')
@@ -360,7 +367,8 @@ def create_auction():
         db.session.commit()
         return redirect(url_for('auctions'))
     else:
-        return render_template('create_auction.html', datetime=datetime)
+        products = Product.query.filter_by(id_user=current_user.id_user).all()
+        return render_template('create_auction.html', datetime=datetime,products=products)
 
 
 @app.route('/auctions', methods=['GET'])
@@ -430,7 +438,8 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
 @app.route('/auctions/<int:id_auction>', methods=['GET'])
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
-    return render_template('auction.html', auction=auction, id_auction=id_auction)
+    product = Product.query.get_or_404(auction.id_product)
+    return render_template('auction.html', auction=auction, id_auction=id_auction, product=product)
 
 
 @app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
@@ -476,11 +485,12 @@ def close_auction(auction_id):
         product = Product.query.get_or_404(auction.id_product)
         if auction.id_user == current_user.id_user:
             auction.status = 'closed'
-            product.id_user = auction.winner_id
-            transaction = Transaction(buyer_id=auction.winner_id, seller_id=auction.id_user,
-                                      product_id=auction.id_product,
-                                      price=auction.curent_price)
-            db.session.add(transaction)
+            if auction.winner_id is not None:
+                product.id_user = auction.winner_id
+                transaction = Transaction(buyer_id=auction.winner_id, seller_id=auction.id_user,
+                                          product_id=auction.id_product,
+                                          price=auction.curent_price)
+                db.session.add(transaction)
             db.session.commit()
             flash('You have successfully closed the auction!', 'success')
             return redirect(url_for('auctions'))
@@ -488,7 +498,57 @@ def close_auction(auction_id):
             flash('You cannot close this auction!', 'warning')
             return redirect(url_for('get_auction', auction_id=auction_id))
     else:
-        return redirect(url_for('get_auction', auction_id=auction_id))
+        return redirect(url_for('get_auction', id_auction=auction_id))
+
+@app.route('/auctions/<int:auction_id>/open', methods=['POST', 'GET'])
+@login_required
+def open_auction(auction_id):
+    if request.method == 'POST':
+        auction = Auction.query.get_or_404(auction_id)
+        product = Product.query.get_or_404(auction.id_product)
+        if auction.id_user == current_user.id_user:
+            auction.status = 'active'
+            db.session.commit()
+            flash('You have successfully activated the auction!', 'success')
+            return redirect(url_for('auctions'))
+        else:
+            flash('You cannot activate this auction!', 'warning')
+            return redirect(url_for('get_auction', auction_id=auction_id))
+    else:
+        return redirect(url_for('get_auction', id_auction=auction_id))
+@app.route('/posts/<int:id_post>/open', methods=['POST', 'GET'])
+@login_required
+def open_post(id_post):
+    if request.method == 'POST':
+        post = Post.query.get_or_404(id_post)
+        product = Product.query.get_or_404(post.id_post)
+        if post.id_user == current_user.id_user:
+            post.status = 'active'
+            db.session.commit()
+            flash('You have successfully activated the post!', 'success')
+            return redirect(url_for('posts'))
+        else:
+            flash('You cannot activate this post!', 'warning')
+            return redirect(url_for('get_post', id_post=id_post))
+    else:
+        return redirect(url_for('get_post', id_post=id_post))
+
+@app.route('/posts/<int:id_post>/close', methods=['POST', 'GET'])
+@login_required
+def close_post(id_post):
+    if request.method == 'POST':
+        post = Post.query.get_or_404(id_post)
+        product = Product.query.get_or_404(post.id_post)
+        if post.id_user == current_user.id_user:
+            post.status = 'closed'
+            db.session.commit()
+            flash('You have successfully closed the post!', 'success')
+            return redirect(url_for('posts'))
+        else:
+            flash('You cannot close this post!', 'warning')
+            return redirect(url_for('get_post', id_post=id_post))
+    else:
+        return redirect(url_for('get_post', id_post=id_post))
 
 
 def encrypt(text):
@@ -590,6 +650,54 @@ def send_message():
     else:
         return render_template('send_message.html')
 
+@app.route('/posts/<int:id_post>/update', methods=['POST', 'GET','PUT'])
+@login_required
+def update_post(id_post):
+    post = Post.query.get_or_404(id_post)
+    product = Product.query.get_or_404(post.id_product)
+    if request.method == 'POST':
+        if current_user.id_user == post.id_user:
+            post.title = request.form['title']
+            post.description = request.form['description']
+            post.price = request.form['price']
+            product.category = request.form['category']
+            post.status = request.form['status']
+            if post.status not in ['active', 'closed']:
+                flash('The post can be only active or closed!', 'warning')
+                return redirect(url_for('get_auction', id_post=post.id_post))
+            db.session.commit()
+            flash('You have successfully updated the post!', 'success')
+            return redirect(url_for('posts'))
+        else:
+            flash('You cannot update this post!', 'warning')
+            return redirect(url_for('get_post', post_id=id_post))
+    else:
+        return render_template('update_post.html', post=post,product=product)
+
+@app.route('/auctions/<int:id_auction>/update', methods=['POST', 'GET','PUT'])
+@login_required
+def update_auction(id_auction):
+    auction = Auction.query.get_or_404(id_auction)
+    product = Product.query.get_or_404(auction.id_product)
+    if request.method == 'POST':
+        if current_user.id_user == auction.id_user:
+            auction.title = request.form['title']
+            auction.description = request.form['description']
+            auction.starting_price = request.form['price']
+            product.category = request.form['category']
+            auction.end_date = request.form['end_date']
+            auction.status = request.form['status']
+            if auction.status not in ['active','closed']:
+                flash('The auction can be only active or closed!', 'warning')
+                return redirect(url_for('get_auction', id_auction = auction.id_auction))
+            db.session.commit()
+            flash('You have successfully updated the auction!', 'success')
+            return redirect(url_for('posts'))
+        else:
+            flash('You cannot update this auction!', 'warning')
+            return redirect(url_for('get_auction', auction_id = auction.id_auction))
+    else:
+        return render_template('update_auction.html', auction=auction,product=product)
 
 # Functie pentru a vizualiza mesajele
 # Se foloseste de id-ul personal al utilizatorului logat
