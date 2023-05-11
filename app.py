@@ -441,7 +441,10 @@ def get_auction(id_auction):
     product = Product.query.get_or_404(auction.id_product)
     nume = User.query.filter_by(id_user = auction.id_user).first()
     nume = nume.username
-    return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume)
+    if current_user.id_user == auction.id_user:
+        return render_template('auction_boss.html', auction=auction, id_auction=id_auction, product=product, nume=nume)
+    else:
+        return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume)
 
 
 @app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
