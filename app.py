@@ -439,7 +439,9 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
     product = Product.query.get_or_404(auction.id_product)
-    return render_template('auction.html', auction=auction, id_auction=id_auction, product=product)
+    nume = User.query.filter_by(id_user = auction.id_user).first()
+    nume = nume.username
+    return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume)
 
 
 @app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
