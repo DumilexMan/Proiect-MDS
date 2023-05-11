@@ -792,6 +792,15 @@ def send_message_post():
         return render_template('send_message_post.html', nume=nume)
 
 
+
+@app.route('/view_transactions')
+@login_required
+def view_transactions():
+    transactions = Transaction.query.filter((Transaction.buyer_id == current_user.id_user) | (Transaction.seller_id == current_user.id_user)).all()
+    if transactions == None:
+        render_template('index.html')
+    return render_template('transactions.html', tranzactii=transactions)
+
 @app.route('/')
 def home():
     return render_template("index.html")
