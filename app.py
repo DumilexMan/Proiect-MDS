@@ -299,7 +299,10 @@ def get_post(post_id):
     post = Post.query.get_or_404(post_id)
     product = Product.query.filter_by(id_product=post.id_product).first()
     nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
-    return render_template('post.html', post=post, nume=nume_proprietar,product = product)
+    if post.id_user == current_user.id_user:
+        return render_template('post_boss.html', post=post, nume=nume_proprietar, product=product)
+    else:
+        return render_template('post.html', post=post, nume=nume_proprietar,product = product)
 
 
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
