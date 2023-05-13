@@ -292,7 +292,18 @@ def get_post(post_id):
     # Get the post with the specified ID from the database
     post = Post.query.get_or_404(post_id)
     nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
+<<<<<<< Updated upstream
     return render_template('post.html', post=post, nume=nume_proprietar)
+=======
+    if current_user.is_authenticated:
+        user_curent=current_user
+    else:
+        user_curent=User.query.filter_by(id_user=0).first()
+    if current_user.is_authenticated and post.id_user == current_user.id_user:
+        return render_template('post_boss.html', post=post, nume=nume_proprietar, product=product,user_curent=user_curent)
+    else:
+        return render_template('post.html', post=post, nume=nume_proprietar,product = product,user_curent=user_curent)
+>>>>>>> Stashed changes
 
 
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
@@ -363,26 +374,25 @@ def create_auction():
         return render_template('create_auction.html', datetime=datetime)
 
 
-@app.route('/auctions', methods=['GET'])
+@app.route('/auctions', methods=['GET','POST'])
 def auctions():
+
     auctions = Auction.query.all()
+    for auction in auctions:
+        if request.method=='POST':
+            submit_= 'Delete'+str(auction.id_auction)
+            if submit_ in request.form:
+                if auction.id_user == current_user.id_user:
+                    db.session.delete(auction)
+                    db.session.commit()
+                    flash('You have successfully deleted the auction!', 'success')
+                    return redirect(url_for('auctions'))
     if auctions is None:
         flash('There are no auctions.')
         return redirect(url_for('index'))
     return render_template('auctions.html', auctions=auctions)
 
 
-@app.route('/auctions/<int:id_auction>/delete', methods=['POST', 'GET'])
-@login_required
-def delete_auction(id_auction):
-    auction = Auction.query.get_or_404(id_auction)
-    if auction.id_user != current_user.id_user:
-        flash('You cannot delete this auction!', 'warning')
-        return redirect(url_for('auctions'))
-    db.session.delete(auction)
-    db.session.commit()
-    flash('You have successfully deleted the auction!', 'success')
-    return redirect(url_for('auctions'))
 
 
 @app.route('/auctions_ordered_ascending_by_end_date')
@@ -430,10 +440,26 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
 @app.route('/auctions/<int:id_auction>', methods=['GET'])
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
+<<<<<<< Updated upstream
     return render_template('auction.html', auction=auction, id_auction=id_auction)
+=======
+    product = Product.query.get_or_404(auction.id_product)
+    nume = User.query.filter_by(id_user = auction.id_user).first()
+    nume = nume.username
+    if current_user.is_authenticated:
+        user_curent=current_user
+    else:
+        user_curent=User.query.filter_by(id_user=0).first()
+
+    if current_user.is_authenticated and  current_user.id_user == auction.id_user:
+        return render_template('auction_boss.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
+    else:
+        return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
+>>>>>>> Stashed changes
 
 
 @app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
+@login_required
 def create_bid(id_auction):
     return render_template('create_bid.html', id_auction=id_auction)
 
@@ -517,24 +543,48 @@ def decrypt(text):
     return original_text
 
 
-@app.route('/view_questions', methods=['GET', 'POST'])
+@app.route('/view_questions',methods=['GET','POST'])
 def questions():
-    # Adauga intrebare
-    if request.method == 'POST':
-        if 'Intrebare_Submit' in request.form:
 
-            question_text = request.form['question_text']
+    #Adauga intrebare
+    if request.method== 'POST':
+        if 'Intrebare_Submit' in request.form:
+            question_text=request.form['question_text']
             if not question_text:
                 return 'Toate câmpurile sunt obligatorii!', 400
-            question = Question(question_text=question_text)
+            if current_user.is_authenticated:
+                question=Question(question_text=question_text,id_user=current_user.id_user)
+            else:
+                question = Question(question_text=question_text, id_user=0)
             db.session.add(question)
             db.session.commit()
-            flash('Intrebarea a fost adaugata cu succes!', 'success')
+            flash('Intrebarea a fost adaugata cu succes!','success')
             return redirect(url_for('questions'))
 
-    dict = {}
+
+
+    dict={}
     questions = Question.query.all()
     for question in questions:
+
+        user_intrebare=User.query.filter_by(id_user=question.id_user).first()
+        if request.method == 'POST':
+            if current_user.is_authenticated:
+                delete_name= "Delete" + str(question.id_question)
+                if delete_name in request.form:
+                    if  question.id_user==current_user.id_user:
+                        raspunsuri=Answer.query.filter_by(id_question=question.id_question).all()
+                        for raspuns in raspunsuri:
+                            db.session.delete(raspuns)
+                            db.session.commit()
+                        db.session.commit()
+                        db.session.delete(question)
+                        db.session.commit()
+                        flash('Intrebarea a fost stearsa cu succes!', 'success')
+                        return redirect(url_for('questions'))
+                    else:
+                        return 'Nu puteti sterge intrebarile altor utilizatori!', 400
+
         if request.method == 'POST':
 
             submit_name = "Raspuns" + str(question.id_question)
@@ -542,16 +592,29 @@ def questions():
                 answer_text = request.form["answer" + str(question.id_question)]
                 if not answer_text:
                     return 'Toate câmpurile sunt obligatorii!', 400
-                answer = Answer(answer_text=answer_text, id_question=question.id_question)
+                if current_user.is_authenticated:
+                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=current_user.id_user)
+                else:
+                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=0)
                 db.session.add(answer)
                 db.session.commit()
                 flash('Raspunsul a fost adaugat cu succes!', 'success')
                 return redirect(url_for('questions'))
-        dict[(question.id_question, question.question_text)] = []
-        raspunsuri = Answer.query.filter_by(id_question=question.id_question)
+        dict[(question.id_question,question.question_text,question.id_user,user_intrebare.username)]=[]
+        raspunsuri=Answer.query.filter_by(id_question=question.id_question)
         for raspuns in raspunsuri:
-            dict[(question.id_question, question.question_text)].append(raspuns.answer_text)
-    return render_template('view_questions.html', intrebari_raspunsuri=dict)
+            user_raspuns=User.query.filter_by(id_user=raspuns.id_user).first()
+            if request.method == 'POST':
+                if current_user.is_authenticated and raspuns.id_user==current_user.id_user:
+                    delete_name = "Sterge" + str(raspuns.id_answer)
+                    if delete_name in request.form:
+                        db.session.delete(raspuns)
+                        db.session.commit()
+                        flash('Raspunsul a fost sters cu succes!', 'success')
+                        return redirect(url_for('questions'))
+
+            dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email))
+    return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
 
 
 # Functie pentru trimis mesaje

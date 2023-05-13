@@ -7,7 +7,11 @@ from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
+<<<<<<< Updated upstream
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/test'
+=======
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/test'
+>>>>>>> Stashed changes
 app.secret_key = "proiect_Scolar"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.permanent_session_lifetime = timedelta(hours=1)
@@ -79,12 +83,14 @@ class Question(db.Model):
     id_question = db.Column(db.Integer, primary_key = True)
     question_text = db.Column(db.String(1000), nullable=False)
     question_time = db.Column(db.DateTime, default=datetime.utcnow)
+    id_user = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
 class Answer(db.Model):
  __tablename__ = 'answers'
  id_answer = db.Column(db.Integer, primary_key = True)
  answer_text = db.Column(db.String(1000), nullable=False)
  answer_time = db.Column(db.DateTime, default=datetime.utcnow)
  id_question = db.Column(db.Integer, db.ForeignKey('questions.id_question'), nullable=False)
+ id_user = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
 class Bid(db.Model):
     __tablename__ = 'bids'
     id_bid = db.Column(db.Integer, primary_key = True)

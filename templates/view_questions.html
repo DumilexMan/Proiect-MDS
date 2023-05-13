@@ -10,22 +10,37 @@
       <input type="submit" name="Intrebare_Submit" value="Trimite">
     </form>
 
-{% block content %}
 <div class="container">
   <h2>Questions and Answers</h2>
   <hr>
-  {% for (question_id,question_text), answears in intrebari_raspunsuri.items() %}
+  {% for (question_id, question_text, id_user, username_intrebare), answers in intrebari_raspunsuri.items() %}
   <div class="question">
-    <h4>{{ question_text }}</h4>
+    <div>
+        <h4>{{ question_text }}</h4>
+        <p>{{ username_intrebare }}</p> <!-- Corrected variable name -->
+    </div>
+  {% if user_curent.id_user == id_user %}
+    <form action="" method="post">
+    <input type="submit" name={{"Delete"}}{{ question_id }} value="Sterge">
+    </form>
+  {% endif %}
+  {% if user_curent.is_authenticated and user_curent.id_user != question_id %}
   <form action="" method="post">
   <label>Raspunde</label>
-  <textarea name={{"answer"}}{{question_id}} rows="5"></textarea><br><br>
-    <input type="submit" name={{"Raspuns"}}{{question_id}} value="Trimite">
+  <textarea name={{"answer"}}{{ question_id }} rows="5"></textarea><br><br>
+    <input type="submit" name={{"Raspuns"}}{{ question_id }} value="Trimite">
   </form>
-    {% if intrebari_raspunsuri[(question_id,question_text)] %}
+  {% endif %}
+    {% if answers %}
     <ul>
-      {% for answer_text in intrebari_raspunsuri[(question_id,question_text)] %}
-      <li>{{ answer_text }}</li>
+      {% for (answer_text, id_user, answer_id, username_raspuns) in answers %}
+          <li>{{ answer_text }}</li>
+          <li>{{ username_raspuns }}</li>
+          {% if user_curent.id_user == id_user %}
+            <form action="" method="post">
+              <input type="submit" name={{"Sterge"}}{{ answer_id }} value="Sterge">
+            </form>
+          {% endif %}
       {% endfor %}
     </ul>
     {% else %}
@@ -34,6 +49,6 @@
   </div>
   {% endfor %}
 </div>
-{% endblock %}
+
 </body>
 </html>
