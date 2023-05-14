@@ -257,10 +257,28 @@ def posts():
     return render_template('posts.html', posts=posts)
 
 
-@app.route('/posts_filter_by_category/<string:category>')
+@app.route('/posts_filter_by_category/<category>')
 def posts_filter_by_category(category):
-    posts = Post.query.filter_by(category=category).all()
-    return render_template('posts.html', posts=posts)
+    posts = Post.query.filter(Post.status == 'active', Product.category == category)\
+                     .join(Product, Post.id_product == Product.id_product)\
+                     .all()
+    return render_template('posts.html', posts=posts, category=category)
+
+@app.route('/posts_filter_by_category_ascending/<string:category>')
+def filter_posts_by_category_ascending(category):
+    posts = Post.query.filter(Post.status == 'active', Product.category == category)\
+                     .join(Product, Post.id_product == Product.id_product)\
+                     .order_by(Post.price.asc())\
+                     .all()
+    return render_template('posts.html', posts=posts, category=category)
+
+@app.route('/posts_filter_by_category_descending/<string:category>')
+def filter_posts_by_category_descending(category):
+    posts = Post.query.filter(Post.status == 'active', Product.category == category) \
+        .join(Product, Post.id_product == Product.id_product) \
+        .order_by(Post.price.desc()) \
+        .all()
+    return render_template('posts.html', posts=posts, category=category)
 
 
 @app.route('/posts_filter_by_price/<int:lower_price>/<int:upper_price>')
