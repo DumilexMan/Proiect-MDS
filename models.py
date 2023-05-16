@@ -8,7 +8,11 @@ from datetime import timedelta, datetime
 app = Flask(__name__)
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/test'
+=======
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/test'
+>>>>>>> Stashed changes
 =======
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/test'
 >>>>>>> Stashed changes
@@ -30,6 +34,10 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy=True)
     role = db.Column(Enum('user', 'admin'), nullable=False, default='user')
     last_active = db.Column(db.DateTime)
+    buyer_rating=db.Column(db.Float,nullable=False,default=0)
+    seller_rating = db.Column(db.Float, nullable=False, default=0)
+    nr_buyer_ratings= db.Column(db.Integer, nullable=False, default=0)
+    nr_seller_ratings = db.Column(db.Integer, nullable=False, default=0)
 
     def update_last_active(self):
         self.last_active = datetime.now()
@@ -42,6 +50,19 @@ class User(UserMixin, db.Model):
 
     def get_id(self):
         return str(self.id_user)
+
+
+class Feedback(db.Model):
+    __tablename__ = 'feedbacks'
+    id_feedback = db.Column(db.Integer, primary_key=True)
+    id_seller = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    id_buyer = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    id_product= db.Column(db.Integer, db.ForeignKey('products.id_product'), nullable=False)
+    rating= db.Column(db.Integer, nullable=False)
+    feedback_text = db.Column(db.String(1000), nullable=False)
+    feedback_time = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.VARCHAR(10), nullable=False, default='vanzator')
+
 
 
 class Product(db.Model):
@@ -107,6 +128,7 @@ class Transaction(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id_product'),nullable=False)
     price = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Message(db.Model):
     __tablename__ = 'Message'

@@ -1,7 +1,7 @@
 # import socketio
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
-from models import app, db, User, Product, Post, Auction, Transaction, Bid, Message, Question, Answer
+from models import app, db, User, Product, Post, Auction, Transaction, Bid, Message, Question, Answer, Feedback
 import hashlib
 from datetime import datetime, timedelta
 import json
@@ -293,8 +293,11 @@ def get_post(post_id):
     post = Post.query.get_or_404(post_id)
     nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     return render_template('post.html', post=post, nume=nume_proprietar)
 =======
+=======
+>>>>>>> Stashed changes
     if current_user.is_authenticated:
         user_curent=current_user
     else:
@@ -303,6 +306,9 @@ def get_post(post_id):
         return render_template('post_boss.html', post=post, nume=nume_proprietar, product=product,user_curent=user_curent)
     else:
         return render_template('post.html', post=post, nume=nume_proprietar,product = product,user_curent=user_curent)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 
@@ -455,6 +461,9 @@ def get_auction(id_auction):
         return render_template('auction_boss.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
     else:
         return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 
@@ -543,9 +552,21 @@ def decrypt(text):
     return original_text
 
 
+<<<<<<< Updated upstream
 @app.route('/view_questions',methods=['GET','POST'])
 def questions():
 
+=======
+
+
+
+
+
+
+@app.route('/view_questions',methods=['GET','POST'])
+def questions():
+
+>>>>>>> Stashed changes
     #Adauga intrebare
     if request.method== 'POST':
         if 'Intrebare_Submit' in request.form:
@@ -615,6 +636,11 @@ def questions():
 
             dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email))
     return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 
 
 # Functie pentru trimis mesaje
@@ -742,6 +768,116 @@ def send_message_post():
         return render_template('send_message_post.html', nume=nume)
 
 
+<<<<<<< Updated upstream
+=======
+
+@app.route('/view_transactions', methods=['GET', 'POST'])
+@login_required
+def view_transactions():
+    transactions = Transaction.query.filter(
+        (Transaction.buyer_id == current_user.id_user) | (Transaction.seller_id == current_user.id_user)
+    ).all()
+    if len(transactions) == 0:
+        flash('Nu ai nicio tranzactie!', 'warning')
+        return render_template('transactions.html')
+
+    if request.method == 'POST':
+        for tranzactie in transactions:
+            if "Feedback" + str(tranzactie.id_transaction) in request.form:
+                return redirect(url_for('give_feedback', tranzactie_id=tranzactie.id_transaction, user_curent_id=current_user.id_user))
+
+
+    return render_template('transactions.html', tranzactii=transactions, user_curent=current_user)
+
+
+@app.route('/give_feedback', methods=['GET', 'POST'])
+@login_required
+def give_feedback():
+    tranzactie_id = request.args.get('tranzactie_id')
+    user_curent_id = request.args.get('user_curent_id')
+    tranzactie = Transaction.query.filter_by(id_transaction=(tranzactie_id)).first()
+    user_curent = User.query.filter_by(id_user=(user_curent_id)).first()
+
+    if request.method == 'POST':
+        feedback = request.form['feedback_text']
+        rating = request.form['rating']
+
+        if feedback == "" :
+            flash('Toate câmpurile sunt obligatorii!', 'warning')
+            return redirect(url_for('view_transactions'))
+
+        if int(rating) < 1 or int(rating) > 10:
+            flash('Ratingul trebuie sa fie intre 1 si 10!', 'warning')
+            return redirect(url_for('view_transactions'))
+
+
+
+#Trebuie modificat statusul la feedback pt ca nu putem da feedback vanzator-cumparator si cumparator-vanzator
+        if tranzactie.buyer_id == user_curent.id_user:
+            if len(Feedback.query.filter_by(id_seller=tranzactie.seller_id, id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='cumparator').all())==0:
+                feedback_1 = Feedback(feedback_text=feedback,rating=rating,id_seller=tranzactie.seller_id,id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='cumparator')
+                db.session.add(feedback_1)
+                vanzator = User.query.filter_by(id_user=tranzactie.seller_id).first()
+                vanzator.seller_rating = (vanzator.seller_rating * vanzator.nr_seller_ratings + int(rating)) / (
+                            vanzator.nr_seller_ratings + 1)
+                vanzator.nr_seller_ratings += 1
+                db.session.commit()
+            else:
+                flash('Ai dat deja feedback pentru aceasta tranzactie!', 'warning')
+                return redirect(url_for('view_transactions'))
+
+
+        if tranzactie.seller_id == user_curent.id_user:
+            if len(Feedback.query.filter_by(id_seller=tranzactie.seller_id, id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='vanzator').all())==0:
+                feedback_1 = Feedback(feedback_text=feedback, rating=rating, id_seller=tranzactie.seller_id,id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='vanzator')
+                db.session.add(feedback_1)
+                cumparator = User.query.filter_by(id_user=tranzactie.buyer_id).first()
+                cumparator.buyer_rating = (cumparator.buyer_rating * cumparator.nr_buyer_ratings + int(rating)) / (
+                            cumparator.nr_buyer_ratings + 1)
+                cumparator.nr_buyer_ratings += 1
+                db.session.commit()
+            else:
+                flash('Ai dat deja feedback pentru aceasta tranzactie!', 'warning')
+                return redirect( url_for('view_transactions'))
+
+
+
+        return redirect(url_for('view_transactions'))
+    else:
+        return render_template('feedback.html', tranzactie=tranzactie, user_curent=user_curent)
+
+
+@app.route('/view_feedbacks', methods=['GET', 'POST'])
+
+def view_feedback():
+    feedbacks=Feedback.query.all()
+    users=User.query.all()
+    if feedbacks is None:
+        flash('Nu ai niciun feedback!', 'warning')
+        return render_template('view_feedbacks.html')
+    else:
+        feedbacks_vanzator={}
+        feedbacks_cumparator={}
+        for feedback in feedbacks:
+            if feedback.status=='vanzator':
+                user=User.query.filter_by(id_user=feedback.id_buyer).first()
+                if user not in feedbacks_cumparator:
+                    feedbacks_cumparator[user]=[feedback]
+                else:
+                    feedbacks_cumparator[user].append(feedback)
+            if feedback.status=='cumparator':
+                user=User.query.filter_by(id_user=feedback.id_seller).first()
+                if user not in feedbacks_vanzator:
+                    feedbacks_vanzator[user]=[feedback]
+                else:
+                    feedbacks_vanzator[user].append(feedback)
+        return render_template('view_feedbacks.html',users=users,feedbacks_vanzator=feedbacks_vanzator, feedbacks_cumparator=feedbacks_cumparator)
+
+
+
+
+
+>>>>>>> Stashed changes
 @app.route('/')
 def home():
     return render_template("index.html")
