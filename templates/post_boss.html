@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Post Details</title>
+    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"
+            integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA=="
+            crossorigin="anonymous"></script>
+
+</head>
+<body>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<h1>{{ post.title }}</h1>
+<p>Category: {{ product.category }}</p>
+<p>Description{{ post.description }}</p>
+<p>Price: {{ post.price }}</p>
+<p>Status: {{ post.status }}</p>
+<p>Star Date: {{ post.start_date }}</p>
+<p>End Date: {{ post.end_date }}</p>
+<p>Seller: {{ nume }}</p>
+<img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine">
+{% if user_curent.id_user!=0 %}
+{% if user_curent.id_user==post.id_user and post.status=='active' %}
+<form method="POST" action="{{ url_for('close_post', id_post=post.id_post) }}">
+    <button type="submit">Close Post</button>
+</form>
+{% endif %}
+{% if user_curent.id_user==post.id_user and post.status=='closed' %}
+<form method="POST" action="{{ url_for('open_post', id_post=post.id_post) }}">
+    <button type="submit">Open Post</button>
+</form>
+{% endif %}
+{% if user_curent.id_user==post.id_user %}
+<form method="GET" action="{{ url_for('update_post', id_post=post.id_post) }}">
+    <button type="submit">Update Post</button>
+</form>
+{% endif %}
+{%if user_curent.id_user!=post.id_user %}
+<form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
+    <button type="submit">Cumpara</button>
+</form>
+{% endif %}
+</form>
+
+
+<script>
+    function sendMessage(nume) {
+        var url = '/send_message_post?nume=' + encodeURIComponent(nume);
+        window.location.href = url;
+    }
+</script>
+
+{% if user_curent.id_user!=post.id_user %}
+<button onclick="sendMessage('{{ nume }}')">Trimiteți un mesaj către proprietar</button>
+
+<div id="message-modal" style="display: none;">
+    <form onsubmit="sendMessage(); return false;">
+        <label for="message">Mesaj:</label>
+        <textarea id="message" name="message" rows="4" cols="50"></textarea>
+        <br>
+        <button type="submit">Trimite</button>
+    </form>
+</div>
+{% endif %}
+{% endif %}
+
+{#
+<script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
+#}
+{#
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"
+        integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA=="
+        crossorigin="anonymous"></script>
+#}
+
+</body>
+</html>
