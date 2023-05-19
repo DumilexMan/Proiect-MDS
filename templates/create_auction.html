@@ -26,10 +26,16 @@
     <input type="datetime-local" name="start_date" required><br>
     <label for="end_date">Data și ora de încheiere:</label>
     <input type="datetime-local" name="end_date" required><br>
-    <label for="id_product">ID produs:</label>
-    <input type="text" name="id_product" required><br>
+    <div class="form-group">
+        <label for="product">Product:</label>
+        <select id="product" name="product" class="form-control" required>
+            {% for product in products %}
+                <option value="{{ product.id_product }}">{{ product.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
     <button type="submit">Creează licitație</button>
-    <button id="button" onclick="window.location.href='/'">Home Page</button>
+
 </form>
 </body>
 </html>

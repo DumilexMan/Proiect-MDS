@@ -7,7 +7,8 @@ from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/test'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:mirceapetcu@localhost/mds_db'
 app.secret_key = "proiect_Scolar"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.permanent_session_lifetime = timedelta(hours=1)
@@ -26,6 +27,10 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Post', backref='author', lazy=True)
     role = db.Column(Enum('user', 'admin'), nullable=False, default='user')
     last_active = db.Column(db.DateTime)
+    buyer_rating=db.Column(db.Float,nullable=False,default=0)
+    seller_rating = db.Column(db.Float, nullable=False, default=0)
+    nr_buyer_ratings= db.Column(db.Integer, nullable=False, default=0)
+    nr_seller_ratings = db.Column(db.Integer, nullable=False, default=0)
 
     def update_last_active(self):
         self.last_active = datetime.now()
@@ -40,12 +45,26 @@ class User(UserMixin, db.Model):
         return str(self.id_user)
 
 
+class Feedback(db.Model):
+    __tablename__ = 'feedbacks'
+    id_feedback = db.Column(db.Integer, primary_key=True)
+    id_seller = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    id_buyer = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
+    id_product= db.Column(db.Integer, db.ForeignKey('products.id_product'), nullable=False)
+    rating= db.Column(db.Integer, nullable=False)
+    feedback_text = db.Column(db.String(1000), nullable=False)
+    feedback_time = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.VARCHAR(10), nullable=False, default='vanzator')
+
+
+
 class Product(db.Model):
     __tablename__ = 'products'
     id_product = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(100))
+    image_data = db.Column(db.LargeBinary(length=4294967295))
     id_user = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
 
 class Post(db.Model):
@@ -79,12 +98,14 @@ class Question(db.Model):
     id_question = db.Column(db.Integer, primary_key = True)
     question_text = db.Column(db.String(1000), nullable=False)
     question_time = db.Column(db.DateTime, default=datetime.utcnow)
+    id_user = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
 class Answer(db.Model):
  __tablename__ = 'answers'
  id_answer = db.Column(db.Integer, primary_key = True)
  answer_text = db.Column(db.String(1000), nullable=False)
  answer_time = db.Column(db.DateTime, default=datetime.utcnow)
  id_question = db.Column(db.Integer, db.ForeignKey('questions.id_question'), nullable=False)
+ id_user = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
 class Bid(db.Model):
     __tablename__ = 'bids'
     id_bid = db.Column(db.Integer, primary_key = True)
@@ -101,6 +122,7 @@ class Transaction(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id_product'),nullable=False)
     price = db.Column(db.Float, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class Message(db.Model):
     __tablename__ = 'Message'

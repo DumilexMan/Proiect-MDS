@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Feedbacks</title>
+</head>
+<body>
+    <h1>Feedbacks</h1>
+{% for user in users %}
+
+    {% if user.id_user!=0 %}
+         <div>Numele {{ user.username }}</div>
+           <div>Vanzator</div>
+              {% if user in feedbacks_vanzator %}
+                  <div>Rating Vanzator user {{ user.seller_rating }}</div>
+                    {% for feedback in feedbacks_vanzator[user] %}
+                       <div>Feedback:{{ feedback.feedback_text }}</div>
+                        <div>Rating:{{ feedback.rating }}</div>
+                    {% endfor %}
+                {% endif %}
+          <div>Cumparator</div>
+            {% if user in feedbacks_cumparator %}
+                <div>Rating Cumparator user {{ user.buyer_rating }}</div>
+                    {% for feedback in feedbacks_cumparator[user] %}
+                       <div>Feedback:{{ feedback.feedback_text }}</div>
+                        <div>Rating:{{ feedback.rating }}</div>
+                    {% endfor %}
+                {% endif %}
+    {% endif %}
+{% endfor %}
+
+</body>
+</html>
