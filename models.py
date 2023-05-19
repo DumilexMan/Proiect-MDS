@@ -7,15 +7,8 @@ from datetime import timedelta, datetime
 
 app = Flask(__name__)
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/test'
-=======
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/test'
->>>>>>> Stashed changes
-=======
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/test'
->>>>>>> Stashed changes
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:mirceapetcu@localhost/mds_db'
 app.secret_key = "proiect_Scolar"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.permanent_session_lifetime = timedelta(hours=1)
@@ -71,6 +64,7 @@ class Product(db.Model):
     name = db.Column(db.String(100))
     price = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(100))
+    image_data = db.Column(db.LargeBinary(length=4294967295))
     id_user = db.Column(db.Integer, db.ForeignKey('users.id_user'), nullable=False)
 
 class Post(db.Model):
