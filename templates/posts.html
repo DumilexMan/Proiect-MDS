@@ -3,6 +3,11 @@
 <head>
     <title>All Posts</title>
 </head>
+
+<script>
+
+
+</script>
 <body>
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -25,43 +30,20 @@
         </li>
         {% endfor %}
     </ul>
- <label for="category">Produse in functie de categorie</label>
-     <select id="category">
-  <option value="">Toate</option>
+ <label for="option">Produse in functie de categorie</label>
+     <select id="option">
   <option value="electronice">Electronice</option>
   <option value="imbracaminte">Imbracaminte</option>
   <option value="jucarii">Jucarii</option>
   <option value="carti">Carti</option>
   <option value="altele">Altele</option>
 </select>
-<label for="price">Produse in functie de pret</label>
-     <select id="price">
+<label for="option">Produse in functie de pret</label>
+     <select id="option">
   <option value="crescator">Crescator</option>
   <option value="descrescator">Descrescator</option>
 </select>
-
-<button class="filter-button">Filtreaza</button>
-<script>
-    const filterButton = document.querySelector('.filter-button');
-filterButton.addEventListener('click', () => {
-    const category = document.querySelector('#category').value;
-    const priceOrder = document.querySelector('#price').value;
-
-    if(category !== "") {
-    if(priceOrder === "crescator") {
-        window.location.href = `/posts_filter_by_category_ascending/${category}`;
-    } else if(priceOrder === "descrescator") {
-        window.location.href = `/posts_filter_by_category_descending/${category}`;
-    } else {
-        window.location.href = `/posts_filter_by_category/${category}`;
-    }
-    } else if(priceOrder === "crescator") {
-    window.location.href = `/posts_filter_ascending_by_price?price_order=${priceOrder}`;
-    } else if(priceOrder === "descrescator") {
-    window.location.href = `/posts_filter_descending_by_price?price_order=${priceOrder}`;
-}
-});
-</script>
+<button >Filtreaza</button>
 
 </body>
 </html>

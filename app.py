@@ -263,28 +263,10 @@ def posts():
     return render_template('posts.html', posts=posts)
 
 
-@app.route('/posts_filter_by_category/<category>')
+@app.route('/posts_filter_by_category/<string:category>')
 def posts_filter_by_category(category):
-    posts = Post.query.filter(Post.status == 'active', Product.category == category)\
-                     .join(Product, Post.id_product == Product.id_product)\
-                     .all()
-    return render_template('posts.html', posts=posts, category=category)
-
-@app.route('/posts_filter_by_category_ascending/<string:category>')
-def filter_posts_by_category_ascending(category):
-    posts = Post.query.filter(Post.status == 'active', Product.category == category)\
-                     .join(Product, Post.id_product == Product.id_product)\
-                     .order_by(Post.price.asc())\
-                     .all()
-    return render_template('posts.html', posts=posts, category=category)
-
-@app.route('/posts_filter_by_category_descending/<string:category>')
-def filter_posts_by_category_descending(category):
-    posts = Post.query.filter(Post.status == 'active', Product.category == category) \
-        .join(Product, Post.id_product == Product.id_product) \
-        .order_by(Post.price.desc()) \
-        .all()
-    return render_template('posts.html', posts=posts, category=category)
+    posts = Post.query.filter_by(category=category).all()
+    return render_template('posts.html', posts=posts)
 
 
 @app.route('/posts_filter_by_price/<int:lower_price>/<int:upper_price>')
@@ -318,7 +300,7 @@ def get_post(post_id):
     product = Product.query.filter_by(id_product=post.id_product).first()
     nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
 
-    return render_template('post.html', post=post, nume=nume_proprietar)
+    #return render_template('post.html', post=post, nume=nume_proprietar)
 
     if current_user.is_authenticated:
         user_curent=current_user
@@ -466,7 +448,7 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
 
-    return render_template('auction.html', auction=auction, id_auction=id_auction)
+    #return render_template('auction.html', auction=auction, id_auction=id_auction)
 
     product = Product.query.get_or_404(auction.id_product)
     nume = User.query.filter_by(id_user = auction.id_user).first()
@@ -974,14 +956,14 @@ def view_feedback():
 
 
 
-
-@app.route('/view_transactions')
-@login_required
-def view_transactions():
-    transactions = Transaction.query.filter((Transaction.buyer_id == current_user.id_user) | (Transaction.seller_id == current_user.id_user)).all()
-    if transactions == None:
-        render_template('index.html')
-    return render_template('transactions.html', tranzactii=transactions)
+#
+# @app.route('/view_transactions')
+# @login_required
+# def view_transactions():
+#     transactions = Transaction.query.filter((Transaction.buyer_id == current_user.id_user) | (Transaction.seller_id == current_user.id_user)).all()
+#     if transactions == None:
+#         render_template('index.html')
+#     return render_template('transactions.html', tranzactii=transactions)
 
 @app.route('/')
 def home():
