@@ -2,59 +2,111 @@
 <html lang="en">
 <head>
     <title>Auction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static\css\auction_boss.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+      background-size: cover;
+        }
+         .form-control{
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
+
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        select{
+        background-color:lightblue ;
+    }
+    input{
+        background-color:lightblue ;
+    }
+          .container {
+        background-color: lightblue;
+        color: black;
+        padding: 20px;
+        border-radius: 5px;
+              position: absolute;
+          top:10%;
+          left:10%;
+    }
+
+    h1, p {
+        color:black;
+    }
+
+    .btn-primary{
+        background-color: #E1F3E8;
+        border: none;
+        color: #000000;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #B5E0C7;
+    }
+
+    </style>
 </head>
 <body>
-{% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages() %}
     {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
+    <ul class="flashes">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
     {% endif %}
-{% endwith %}
-<h1>{{ auction.title }}</h1>
-<p>Description: {{ auction.description }}</p>
-<p>Starting Bid: {{ auction.starting_price }}</p>
-<p>Current Bid: {{ auction.curent_price }}</p>
-<p>Current Bid: {{ auction.status }}</p>
-<img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine">
-{% if user_curent.id_user!=0 %}
-{% if user_curent.id_user == auction.id_user and auction.status=='active' %}
-<form method="POST" action="{{ url_for('close_auction', auction_id=auction.id_auction) }}">
-    <button type="submit">Close Auction</button></form>
-{% endif %}
-{% if user_curent.id_user == auction.id_user and auction.status=='closed' %}
-<form method="POST" action="{{ url_for('open_auction', auction_id=auction.id_auction) }}">
-    <button type="submit">Open Auction</button></form>
-{% endif %}
-{% if user_curent.id_user == auction.id_user %}
-<form method="GET" action="{{ url_for('update_auction', id_auction=auction.id_auction) }}">
-    <button type="submit">Update Auction</button>
-</form>
-{% endif %}
-{% if user_curent.id_user != auction.id_user %}
-<form method="GET" action="{{ url_for('create_bid', id_auction=auction.id_auction) }}">
-    <button type="submit">Add Bid</button></form>
-</form>
-{% endif %}
-<script>
-    function sendMessage(nume) {
-        var url = '/send_message_post?nume=' + encodeURIComponent(nume);
-        window.location.href = url;
-    }
-</script>
-{% if user_curent.id_user != auction.id_user %}
-<button onclick="sendMessage('{{ nume }}')">Trimiteți un mesaj către proprietar</button>
-{% endif %}
-<div id="message-modal" style="display: none;">
-    <form onsubmit="sendMessage(); return false;">
-        <label for="message">Mesaj:</label>
-        <textarea id="message" name="message" rows="4" cols="50"></textarea>
-        <br>
-        <button type="submit">Trimite</button>
-    </form>
-</div>
-{% endif %}
+    {% endwith %}
+    <div class="container">
+        <h1>{{ auction.title }}</h1>
+        <p>Description: {{ auction.description }}</p>
+        <p>Starting Bid: {{ auction.starting_price }}</p>
+        <p>Current Bid: {{ auction.curent_price }}</p>
+        <p>Status: {{ auction.status }}</p>
+        <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine">
+        {% if user_curent.id_user != 0 %}
+        {% if user_curent.id_user == auction.id_user and auction.status == 'active' %}
+        <form method="POST" action="{{ url_for('close_auction', auction_id=auction.id_auction) }}">
+            <button type="submit" class=" btn-primary">Close Auction</button>
+        </form>
+        {% endif %}
+        {% if user_curent.id_user == auction.id_user and auction.status == 'closed' %}
+        <form method="POST" action="{{ url_for('open_auction', auction_id=auction.id_auction) }}">
+            <button type="submit" class="btn-primary">Open Auction</button>
+        </form>
+        {% endif %}
+        <form method="GET" action="{{ url_for('update_auction', id_auction=auction.id_auction) }}">
+            <button type="submit" class="btn-primary">Update Auction</button>
+        </form>
+        {% if user_curent.id_user != auction.id_user %}
+        <form method="GET" action="{{ url_for('create_bid', id_auction=auction.id_auction) }}">
+            <button type="submit" class="btn-primary">Add Bid</button>
+        </form>
+        {% endif %}
+        <div id="message-modal" style="display: none;">
+            <form onsubmit="sendMessage(); return false;">
+                <label for="message">Mesaj:</label>
+                <textarea id="message" name="message" rows="4" cols="50"></textarea>
+                <br>
+                <button type="submit" class="btn-primary">Trimite</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </body>
 </html>

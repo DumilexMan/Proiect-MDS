@@ -259,38 +259,53 @@ def posts_ownded_by_user():
 
 @app.route('/posts')
 def posts():
+    ok=1
     posts = Post.query.all()
-    return render_template('posts.html', posts=posts)
+    return render_template('posts.html', posts=posts,ok=ok)
 
 
-@app.route('/posts_filter_by_category/<string:category>')
-def posts_filter_by_category(category):
-    posts = Post.query.filter_by(category=category).all()
-    return render_template('posts.html', posts=posts)
+@app.route('/posts_filter_by_category')
+def posts_filter_by_category():
+    ok = 0
+    posts = []
+    category = request.args.get('category')
+    products = Product.query.filter_by(category=category).all()
+    for product in products:
+        posts.append(Post.query.filter_by(id_product=product.id_product).first())
+    return render_template('posts.html', posts=posts, ok=ok)
 
 
-@app.route('/posts_filter_by_price/<int:lower_price>/<int:upper_price>')
-def posts_filter_by_price(lower_price, upper_price):
+
+@app.route('/posts_filter_by_price')
+def posts_filter_by_price():
+    ok=0
+    lower_price = request.args.get('lower_price')
+    upper_price = request.args.get('upper_price')
+
     posts = Post.query.filter(Post.price >= lower_price, Post.price <= upper_price).all()
-    return render_template('posts.html', posts=posts, lower_price=lower_price, upper_price=upper_price)
+    return render_template('posts.html', posts=posts,ok=ok)
 
 
 @app.route('/posts_filter_descending_by_price')
 def posts_filter_descending_by_price():
+    ok=0
     posts = Post.query.order_by(Post.price.desc()).all()
-    return render_template('posts.html', posts=posts)
+    return render_template('posts.html', posts=posts,ok=ok)
 
 
 @app.route('/posts_filter_ascending_by_price')
 def posts_filter_ascending_by_price():
     posts = Post.query.order_by(Post.price.asc()).all()
-    return render_template('posts.html', posts=posts)
+    ok=0
+    return render_template('posts.html', posts=posts,ok=ok)
 
 
-@app.route('/posts_filter_by_date/<string:date>')
-def posts_filter_by_date(date):
+@app.route('/posts_filter_by_date')
+def posts_filter_by_date():
+    ok=0
+    date = request.args.get('date')
     posts = Post.query.filter(Post.start_date <= date, Post.end_date >= date).all()
-    return render_template('posts.html', posts=posts)
+    return render_template('posts.html', posts=posts,ok=ok)
 
 
 @app.route('/posts/<int:post_id>', methods=['POST', 'GET'])
@@ -299,9 +314,6 @@ def get_post(post_id):
     post = Post.query.get_or_404(post_id)
     product = Product.query.filter_by(id_product=post.id_product).first()
     nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
-
-    return render_template('post.html', post=post, nume=nume_proprietar)
-
     if current_user.is_authenticated:
         user_curent=current_user
     else:
@@ -383,6 +395,7 @@ def create_auction():
 
 @app.route('/auctions', methods=['GET','POST'])
 def auctions():
+    ok=1
 
     auctions = Auction.query.all()
     for auction in auctions:
@@ -397,59 +410,71 @@ def auctions():
     if auctions is None:
         flash('There are no auctions.')
         return redirect(url_for('index'))
-    return render_template('auctions.html', auctions=auctions)
+    return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 
 
-@app.route('/auctions_ordered_ascending_by_end_date')
+@app.route('/auctions_ordered_ascending_by_current_price')
 def auctions_order_by_end_date():
-    auctions = Auction.query.order_by(Auction.end_date.asc()).all()
+    ok=0
+    auctions = Auction.query.order_by(Auction.curent_price.asc()).all()
 
-    return render_template('auctions.html', auctions=auctions)
+    return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_ordered_descending_by_current_price')
 def auctions_order_by_current_price():
+    ok=0
     auctions = Auction.query.order_by(Auction.curent_price.desc()).all()
-    return render_template('auctions.html', auctions=auctions)
+    return render_template('auctions.html', auctions=auctions,ok=ok)
+
+
+@app.route('/auctions_filter_by_date')
+def auctions_filter_by_date():
+    ok=0
+    date=request.args.get('date')
+    auctions = Auction.query.filter(Auction.start_date <= date, Auction.end_date >= date).all()
+    return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_with_status_open')
 def auctions_with_status_open():
+    ok=0
     auctions = Auction.query.filter_by(status='active').all()
     if auctions is None:
         flash('There are no auctions.')
         return redirect(url_for('index'))
-    return render_template('auctions.html', auctions=auctions)
+    return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_with_status_closed')
 def auctions_with_status_closed():
+    ok=0
     auctions = Auction.query.filter_by(status='closed').all()
     if auctions is None:
         flash('There are no auctions.')
         return redirect(url_for('index'))
-    return render_template('auctions.html', auctions=auctions)
+    return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
-@app.route('/auctions_with_status_open_with_current_price_between<int:price1>/<int:price2>')
-def auctions_with_status_open_with_current_price_between(price1, price2):
+@app.route('/auctions_with_status_open_with_range_price')
+def auctions_with_status_open_with_current_price_between():
+    ok=0
+    price1 = request.args.get('lower_price')
+    price2 = request.args.get('upper_price')
     if price1 > price2:
         flash('The lower price must be lower than the upper price!', 'warning')
         return redirect(url_for('auctions'))
     auctions = Auction.query.filter(Auction.status == 'active',
                                          Auction.curent_price >= price1,
                                          Auction.curent_price <= price2).all()
-    return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2)
+    return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2,ok=ok)
 
 
 @app.route('/auctions/<int:id_auction>', methods=['GET'])
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
-
-    return render_template('auction.html', auction=auction, id_auction=id_auction)
-
     product = Product.query.get_or_404(auction.id_product)
     nume = User.query.filter_by(id_user = auction.id_user).first()
     nume = nume.username
@@ -462,7 +487,6 @@ def get_auction(id_auction):
         return render_template('auction_boss.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
     else:
         return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
-
 
 
 @app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
@@ -601,8 +625,15 @@ def decrypt(text):
     return original_text
 
 
+
+
+
+
+
+
 @app.route('/view_questions',methods=['GET','POST'])
 def questions():
+
     #Adauga intrebare
     if request.method== 'POST':
         if 'Intrebare_Submit' in request.form:
@@ -672,6 +703,7 @@ def questions():
 
             dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email))
     return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
+
 
 
 
@@ -849,7 +881,6 @@ def send_message_post():
 
 
 
-
 @app.route('/view_transactions', methods=['GET', 'POST'])
 @login_required
 def view_transactions():
@@ -955,15 +986,6 @@ def view_feedback():
 
 
 
-
-
-@app.route('/view_transactions')
-@login_required
-def view_transactions():
-    transactions = Transaction.query.filter((Transaction.buyer_id == current_user.id_user) | (Transaction.seller_id == current_user.id_user)).all()
-    if transactions == None:
-        render_template('index.html')
-    return render_template('transactions.html', tranzactii=transactions)
 
 @app.route('/')
 def home():

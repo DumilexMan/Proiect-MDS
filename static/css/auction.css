@@ -1,0 +1,32 @@
+  .container {
+        background-color: white;
+        color: black;
+        padding: 20px;
+        border-radius: 5px;
+    }
+
+    h1, p {
+        color:black;
+    }
+
+    .btn-primary{
+        background-color: #E1F3E8;
+        border: none;
+        color: #000000;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #B5E0C7;
+    }
+    select{
+        background-color:lightblue ;
+    }
+    input{
+        background-color:lightblue ;
+    }

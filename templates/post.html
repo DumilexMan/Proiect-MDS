@@ -1,85 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Post Details</title>
-    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"
-            integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA=="
-            crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static\css\post.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+            background-size: cover;
+        }
+    </style>
 </head>
 <body>
-
     {% with messages = get_flashed_messages() %}
     {% if messages %}
     <ul class="flashes">
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
     </ul>
     {% endif %}
     {% endwith %}
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.description }}</p>
-    <p>Price: {{ post.price }}</p>
-    <p>Status: {{ post.status }}</p>
-    <p>Star Date: {{ post.start_date }}</p>
-    <p>End Date: {{ post.end_date }}</p>
-    <p>Vanzator: {{ nume }}</p>
-    <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
-        <button type="submit">Cumpara</button>
-    </form>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="text-center">{{ post.title }}</h1>
+            </div>
+            <div class="card-body">
+                <p><strong>Category:</strong> {{ product.category }}</p>
+                <p><strong>Description:</strong> {{ post.description }}</p>
+                <p><strong>Price:</strong> {{ post.price }}</p>
+                <p><strong>Status:</strong> {{ post.status }}</p>
+                <p><strong>Start Date:</strong> {{ post.start_date }}</p>
+                <p><strong>End Date:</strong> {{ post.end_date }}</p>
+                <p><strong>Seller:</strong> {{ nume }}</p>
+                <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine" class="img-fluid">
 
+                {% if user_curent.id_user != 0 %}
+                <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
+                    <button type="submit" class="btn-primary">Buy</button>
+                </form>
 
-{% if user_curent.id_user!=0 %}
+                <button onclick="sendMessage('{{ nume }}')" class="btn-primary">Send Message to Owner</button>
 
-<form method="POST" action="{{ url_for('close_post', id_post=post.id_post) }}">
-    <button type="submit">Close Post</button>
-</form>
-<form method="POST" action="{{ url_for('open_post', id_post=post.id_post) }}">
-    <button type="submit">Open Post</button>
-</form>
-<form method="GET" action="{{ url_for('update_post', id_post=post.id_post) }}">
-    <button type="submit">Update Post</button>
-</form>
-
-<form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
-    <button type="submit">Cumpara</button>
-</form>
-</form>
-
-
-<script>
-    function sendMessage(nume) {
-        var url = '/send_message_post?nume=' + encodeURIComponent(nume);
-        window.location.href = url;
-    }
-</script>
-
-<button onclick="sendMessage('{{ nume }}')">Trimiteți un mesaj către proprietar</button>
-
-
-    <div id="message-modal" style="display: none;">
-        <form onsubmit="sendMessage(); return false;">
-            <label for="message">Mesaj:</label>
-            <textarea id="message" name="message" rows="4" cols="50"></textarea>
-            <br>
-            <button type="submit">Trimite</button>
-        </form>
+                <div id="message-modal" style="display: none;">
+                    <form onsubmit="sendMessage(); return false;">
+                        <div class="form-group">
+                            <label for="message">Message:</label>
+                            <textarea id="message" name="message" rows="4" cols="50" class="form-control"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Send</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-{#    <script src="//code.jquery.com/jquery-3.6.0.min.js"></script>#}
-{#    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js" integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA==" crossorigin="anonymous"></script>#}
-
-{#
-<script src="//code.jquery.com/jquery-3.6.0.min.js"></script>
-#}
-{#
-<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.min.js"
-        integrity="sha512-VpBLkvcfoiV/UdmyXuJ7V8aYvoOo7HsdFBB+fGVk7W8gQsAKsC0Rb9/DiIM7W8MNvYb0rRVr0zqB3/PO8bI0uA=="
-        crossorigin="anonymous"></script>
-#}
-
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script>
+        function sendMessage(nume) {
+            var url = '/send_message_post?nume=' + encodeURIComponent(nume);
+            window.location.href = url;
+        }
+    </script>
 </body>
 </html>

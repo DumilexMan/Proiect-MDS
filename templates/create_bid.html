@@ -3,23 +3,98 @@
 <head>
     <meta charset="utf-8">
     <title>Adauga o oferta</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+            background-size: cover;
+        }
+
+        h1 {
+            color: white;
+        }
+         .form-control{
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
+
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        select{
+        background-color:lightblue ;
+    }
+    input{
+        background-color:lightblue ;
+    }
+
+        .flashes {
+            list-style: none;
+            padding: 0;
+        }
+
+        .flashes li {
+            margin-bottom: 10px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+       .btn-primary{
+        background-color: #E1F3E8;
+        border: none;
+        color: #000000;
+        padding: 5px 10px;
+
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+    }
+
+    .btn-primary:hover {
+        background-color: #B5E0C7;
+    }
+    </style>
 </head>
 <body>
-{% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages() %}
     {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
+    <ul class="flashes">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
     {% endif %}
-{% endwith %}
-<h1>Adauga o oferta</h1>
-<form action="{{ url_for('add_bid', auction_id=id_auction) }}" method="POST">
-    <label for="price">Preț oferit:</label>
-    <input type="number" name="price" step="0.01" min="0" required><br>
-    <button type="submit">Adauga oferta</button>
-</form>
+    {% endwith %}
+    <div class="container">
+        <h1>Adauga o oferta</h1>
+        <form action="{{ url_for('add_bid', auction_id=id_auction) }}" method="POST">
+            <div class="form-group">
+                <label for="price">Preț oferit:</label>
+                <input type="number" name="price" step="0.01" min="0" class="form-control" required>
+            </div>
+            <button type="submit" class="btn-primary">Adauga oferta</button>
+        </form>
+    </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </body>
 </html>

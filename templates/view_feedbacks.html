@@ -8,24 +8,32 @@
 {% for user in users %}
 
     {% if user.id_user!=0 %}
-         <div>Numele {{ user.username }}</div>
-           <div>Vanzator</div>
+        <details>
+        <summary>Mai multe detalii despre {{ user.username }}</summary>
+           <details>
+
+           <summary>Vanzator</summary>
               {% if user in feedbacks_vanzator %}
-                  <div>Rating Vanzator user {{ user.seller_rating }}</div>
+                  <div> Rating final {{ user.seller_rating }}</div>
                     {% for feedback in feedbacks_vanzator[user] %}
                        <div>Feedback:{{ feedback.feedback_text }}</div>
                         <div>Rating:{{ feedback.rating }}</div>
                     {% endfor %}
                 {% endif %}
-          <div>Cumparator</div>
+        </details>
+        <details>
+
+          <summary>Cumparator</summary>
             {% if user in feedbacks_cumparator %}
-                <div>Rating Cumparator user {{ user.buyer_rating }}</div>
+                <div>Rating final {{ user.buyer_rating }}</div>
                     {% for feedback in feedbacks_cumparator[user] %}
                        <div>Feedback:{{ feedback.feedback_text }}</div>
                         <div>Rating:{{ feedback.rating }}</div>
                     {% endfor %}
                 {% endif %}
+        </details>
     {% endif %}
+    </details>
 {% endfor %}
 
 </body>
