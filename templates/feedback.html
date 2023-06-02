@@ -3,18 +3,67 @@
 <head>
     <title>Feedback</title>
 </head>
+<header>
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li>
+                <a href="/posts">Posts</a>
+                <ul class="sub-menu">
+                    <li><a href="/create_post">Add Post</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/auctions">Auctions</a>
+                <ul class="sub-menu">
+                    <li><a href="/auctions/create">Add Auction</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/login">Login</a>
+                <ul class="sub-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/products">Products</a>
+                <ul class="sub-menu">
+                    <li><a href="/add_product">Add Product</a></li>
+                </ul>
+            </li>
+            <li><a href="/view_questions">Questions</a></li>
+            <li><a href="/messages">Messages</a>
+            <ul class="sub-menu">
+                <li><a href="/send_message">Send Message</a></li>
+                <li><a href="/view_feedbacks">View Feedbacks</a></li>
+                <li><a href="/give_feedback">Give Feedback</a></li>
+            </ul>
+            </li>
+        </ul>
+    </div>
+</header>
 <body>
-<form action="" method="post">
-<label>Text_Feedback</label>
-<textarea name="feedback_text" rows="4" cols="50"></textarea>
-<br>
-<label for="price">Rating</label>
-            <input type="number" class="form-control" id="price" name="rating" min="1" step="1" required>
-    <label>Cumparator</label>
-    <p name="id_cumparator">{{ tranzactie.buyer_id }}</p>
-    <label>Vanzator</label>
-<p name="id_vanzator">{{ tranzactie.seller_id}}</p>
-      <input type="submit" value="Trimite">
-</form>
+<link rel="stylesheet" href="/../static/give_feedback.css">
+
+<div id="casuta_prime">
+
+    <form action="" method="post">
+        <textarea name="feedback_text" rows="4" cols="50" placeholder="Text_Feedback"></textarea>
+        <br>
+        <label for="price">Rating</label>
+        <input type="number" class="form-control" id="price" name="rating" min="1" step="1" required>
+        <br>
+        <div id="cumparator">
+            <label>Cumparator</label>
+            <p name="id_cumparator">{{ cumparator.name }}</p>
+        </div>
+        <div id="vanzator">
+            <label>Vanzator</label>
+            <p name="id_vanzator">{{ vanzator.name }}</p>
+        </div>
+        <input type="submit" class="custom-button" value="Trimite">
+    </form>
+</div>
 </body>
 </html>

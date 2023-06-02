@@ -20,11 +20,13 @@ login_manager.login_view = 'login'
 bcrypt = Bcrypt()
 socketio = SocketIO(app)
 
+
 @app.template_filter('b64encode')
 def b64encode_filter(data):
     encoded_bytes = base64.b64encode(data)
     encoded_string = encoded_bytes.decode('utf-8')
     return encoded_string
+
 
 @app.errorhandler(ConnectionError)
 def handle_connection_error(error):
@@ -187,7 +189,7 @@ def add_product():
         else:
             # Crează un obiect de tipul Product cu datele primite prin POST și salvează-l în baza de date
             product = Product(name=name, price=price, category=category,
-                              id_user=user.id_user,image_data=file.read())
+                              id_user=user.id_user, image_data=file.read())
             db.session.add(product)
             db.session.commit()
 
@@ -230,7 +232,7 @@ def create_post():
             return redirect(url_for('posts_ownded_by_user'))
     else:
         products = Product.query.filter_by(id_user=current_user.id_user).all()
-        return render_template('create_post.html', datetime=datetime,products = products)
+        return render_template('create_post.html', datetime=datetime, products=products)
 
 
 @app.route('/products')
@@ -300,16 +302,16 @@ def get_post(post_id):
     product = Product.query.filter_by(id_product=post.id_product).first()
     nume_proprietar = User.query.filter_by(id_user=post.id_user).first().username
 
-    #return render_template('post.html', post=post, nume=nume_proprietar)
+    # return render_template('post.html', post=post, nume=nume_proprietar)
 
     if current_user.is_authenticated:
-        user_curent=current_user
+        user_curent = current_user
     else:
-        user_curent=User.query.filter_by(id_user=0).first()
-    if current_user.is_authenticated and post.id_user == current_user.id_user:
-        return render_template('post_boss.html', post=post, nume=nume_proprietar, product=product,user_curent=user_curent)
-    else:
-        return render_template('post.html', post=post, nume=nume_proprietar,product = product,user_curent=user_curent)
+        user_curent = User.query.filter_by(id_user=0).first()
+
+    return render_template('post_boss.html', post=post, nume=nume_proprietar, product=product,
+                               user_curent=user_curent)
+
 
 
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
@@ -378,16 +380,15 @@ def create_auction():
         return redirect(url_for('auctions'))
     else:
         products = Product.query.filter_by(id_user=current_user.id_user).all()
-        return render_template('create_auction.html', datetime=datetime,products=products)
+        return render_template('create_auction.html', datetime=datetime, products=products)
 
 
-@app.route('/auctions', methods=['GET','POST'])
+@app.route('/auctions', methods=['GET', 'POST'])
 def auctions():
-
     auctions = Auction.query.all()
     for auction in auctions:
-        if request.method=='POST':
-            submit_= 'Delete'+str(auction.id_auction)
+        if request.method == 'POST':
+            submit_ = 'Delete' + str(auction.id_auction)
             if submit_ in request.form:
                 if auction.id_user == current_user.id_user:
                     db.session.delete(auction)
@@ -398,8 +399,6 @@ def auctions():
         flash('There are no auctions.')
         return redirect(url_for('index'))
     return render_template('auctions.html', auctions=auctions)
-
-
 
 
 @app.route('/auctions_ordered_ascending_by_end_date')
@@ -439,8 +438,8 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
         flash('The lower price must be lower than the upper price!', 'warning')
         return redirect(url_for('auctions'))
     auctions = Auction.query.filter(Auction.status == 'active',
-                                         Auction.curent_price >= price1,
-                                         Auction.curent_price <= price2).all()
+                                    Auction.curent_price >= price1,
+                                    Auction.curent_price <= price2).all()
     return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2)
 
 
@@ -448,21 +447,22 @@ def auctions_with_status_open_with_current_price_between(price1, price2):
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
 
-    #return render_template('auction.html', auction=auction, id_auction=id_auction)
+    # return render_template('auction.html', auction=auction, id_auction=id_auction)
 
     product = Product.query.get_or_404(auction.id_product)
-    nume = User.query.filter_by(id_user = auction.id_user).first()
+    nume = User.query.filter_by(id_user=auction.id_user).first()
     nume = nume.username
     if current_user.is_authenticated:
-        user_curent=current_user
+        user_curent = current_user
     else:
-        user_curent=User.query.filter_by(id_user=0).first()
+        user_curent = User.query.filter_by(id_user=0).first()
 
-    if current_user.is_authenticated and  current_user.id_user == auction.id_user:
-        return render_template('auction_boss.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
+    if current_user.is_authenticated and current_user.id_user == auction.id_user:
+        return render_template('auction_boss.html', auction=auction, id_auction=id_auction, product=product, nume=nume,
+                               user_curent=user_curent)
     else:
-        return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume,user_curent=user_curent)
-
+        return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume,
+                               user_curent=user_curent)
 
 
 @app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
@@ -524,6 +524,7 @@ def close_auction(auction_id):
     else:
         return redirect(url_for('get_auction', id_auction=auction_id))
 
+
 @app.route('/auctions/<int:auction_id>/open', methods=['POST', 'GET'])
 @login_required
 def open_auction(auction_id):
@@ -540,6 +541,8 @@ def open_auction(auction_id):
             return redirect(url_for('get_auction', auction_id=auction_id))
     else:
         return redirect(url_for('get_auction', id_auction=auction_id))
+
+
 @app.route('/posts/<int:id_post>/open', methods=['POST', 'GET'])
 @login_required
 def open_post(id_post):
@@ -556,6 +559,7 @@ def open_post(id_post):
             return redirect(url_for('get_post', id_post=id_post))
     else:
         return redirect(url_for('get_post', id_post=id_post))
+
 
 @app.route('/posts/<int:id_post>/close', methods=['POST', 'GET'])
 @login_required
@@ -601,36 +605,34 @@ def decrypt(text):
     return original_text
 
 
-@app.route('/view_questions',methods=['GET','POST'])
+@app.route('/view_questions', methods=['GET', 'POST'])
 def questions():
-    #Adauga intrebare
-    if request.method== 'POST':
+    # Adauga intrebare
+    if request.method == 'POST':
         if 'Intrebare_Submit' in request.form:
-            question_text=request.form['question_text']
+            question_text = request.form['question_text']
             if not question_text:
                 return 'Toate câmpurile sunt obligatorii!', 400
             if current_user.is_authenticated:
-                question=Question(question_text=question_text,id_user=current_user.id_user)
+                question = Question(question_text=question_text, id_user=current_user.id_user)
             else:
                 question = Question(question_text=question_text, id_user=0)
             db.session.add(question)
             db.session.commit()
-            flash('Intrebarea a fost adaugata cu succes!','success')
+            flash('Intrebarea a fost adaugata cu succes!', 'success')
             return redirect(url_for('questions'))
 
-
-
-    dict={}
+    dict = {}
     questions = Question.query.all()
     for question in questions:
 
-        user_intrebare=User.query.filter_by(id_user=question.id_user).first()
+        user_intrebare = User.query.filter_by(id_user=question.id_user).first()
         if request.method == 'POST':
             if current_user.is_authenticated:
-                delete_name= "Delete" + str(question.id_question)
+                delete_name = "Delete" + str(question.id_question)
                 if delete_name in request.form:
-                    if  question.id_user==current_user.id_user:
-                        raspunsuri=Answer.query.filter_by(id_question=question.id_question).all()
+                    if question.id_user == current_user.id_user:
+                        raspunsuri = Answer.query.filter_by(id_question=question.id_question).all()
                         for raspuns in raspunsuri:
                             db.session.delete(raspuns)
                             db.session.commit()
@@ -650,31 +652,32 @@ def questions():
                 if not answer_text:
                     return 'Toate câmpurile sunt obligatorii!', 400
                 if current_user.is_authenticated:
-                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=current_user.id_user)
+                    answer = Answer(answer_text=answer_text, id_question=question.id_question,
+                                    id_user=current_user.id_user)
                 else:
-                    answer = Answer(answer_text=answer_text, id_question=question.id_question,id_user=0)
+                    answer = Answer(answer_text=answer_text, id_question=question.id_question, id_user=0)
                 db.session.add(answer)
                 db.session.commit()
                 flash('Raspunsul a fost adaugat cu succes!', 'success')
                 return redirect(url_for('questions'))
-        dict[(question.id_question,question.question_text,question.id_user,user_intrebare.username)]=[]
-        raspunsuri=Answer.query.filter_by(id_question=question.id_question)
+        dict[(question.id_question, question.question_text, question.id_user, user_intrebare.username)] = []
+        raspunsuri = Answer.query.filter_by(id_question=question.id_question)
         for raspuns in raspunsuri:
-            user_raspuns=User.query.filter_by(id_user=raspuns.id_user).first()
+            user_raspuns = User.query.filter_by(id_user=raspuns.id_user).first()
             if request.method == 'POST':
-                if current_user.is_authenticated and raspuns.id_user==current_user.id_user:
+                if current_user.is_authenticated and raspuns.id_user == current_user.id_user:
                     delete_name = "Sterge" + str(raspuns.id_answer)
                     if delete_name in request.form:
                         db.session.delete(raspuns)
                         db.session.commit()
                         flash('Raspunsul a fost sters cu succes!', 'success')
                         return redirect(url_for('questions'))
+
             if (question.id_question,question.question_text,question.id_user,user_intrebare.email) in dict:
                 dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email))
             else:
                 dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)]=[(raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email)]
     return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
-
 
 
 # Functie pentru trimis mesaje
@@ -713,7 +716,8 @@ def send_message():
     else:
         return render_template('send_message.html')
 
-@app.route('/posts/<int:id_post>/update', methods=['POST', 'GET','PUT'])
+
+@app.route('/posts/<int:id_post>/update', methods=['POST', 'GET', 'PUT'])
 @login_required
 def update_post(id_post):
     post = Post.query.get_or_404(id_post)
@@ -735,9 +739,10 @@ def update_post(id_post):
             flash('You cannot update this post!', 'warning')
             return redirect(url_for('get_post', post_id=id_post))
     else:
-        return render_template('update_post.html', post=post,product=product)
+        return render_template('update_post.html', post=post, product=product)
 
-@app.route('/auctions/<int:id_auction>/update', methods=['POST', 'GET','PUT'])
+
+@app.route('/auctions/<int:id_auction>/update', methods=['POST', 'GET', 'PUT'])
 @login_required
 def update_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
@@ -750,17 +755,18 @@ def update_auction(id_auction):
             product.category = request.form['category']
             auction.end_date = request.form['end_date']
             auction.status = request.form['status']
-            if auction.status not in ['active','closed']:
+            if auction.status not in ['active', 'closed']:
                 flash('The auction can be only active or closed!', 'warning')
-                return redirect(url_for('get_auction', id_auction = auction.id_auction))
+                return redirect(url_for('get_auction', id_auction=auction.id_auction))
             db.session.commit()
             flash('You have successfully updated the auction!', 'success')
             return redirect(url_for('posts'))
         else:
             flash('You cannot update this auction!', 'warning')
-            return redirect(url_for('get_auction', auction_id = auction.id_auction))
+            return redirect(url_for('get_auction', auction_id=auction.id_auction))
     else:
-        return render_template('update_auction.html', auction=auction,product=product)
+        return render_template('update_auction.html', auction=auction, product=product)
+
 
 # Functie pentru a vizualiza mesajele
 # Se foloseste de id-ul personal al utilizatorului logat
@@ -850,8 +856,6 @@ def send_message_post():
         return render_template('send_message_post.html', nume=nume)
 
 
-
-
 @app.route('/view_transactions', methods=['GET', 'POST'])
 @login_required
 def view_transactions():
@@ -865,8 +869,8 @@ def view_transactions():
     if request.method == 'POST':
         for tranzactie in transactions:
             if "Feedback" + str(tranzactie.id_transaction) in request.form:
-                return redirect(url_for('give_feedback', tranzactie_id=tranzactie.id_transaction, user_curent_id=current_user.id_user))
-
+                return redirect(url_for('give_feedback', tranzactie_id=tranzactie.id_transaction,
+                                        user_curent_id=current_user.id_user))
 
     return render_template('transactions.html', tranzactii=transactions, user_curent=current_user)
 
@@ -883,7 +887,7 @@ def give_feedback():
         feedback = request.form['feedback_text']
         rating = request.form['rating']
 
-        if feedback == "" :
+        if feedback == "":
             flash('Toate câmpurile sunt obligatorii!', 'warning')
             return redirect(url_for('view_transactions'))
 
@@ -891,71 +895,76 @@ def give_feedback():
             flash('Ratingul trebuie sa fie intre 1 si 10!', 'warning')
             return redirect(url_for('view_transactions'))
 
-
-
-#Trebuie modificat statusul la feedback pt ca nu putem da feedback vanzator-cumparator si cumparator-vanzator
+        # Trebuie modificat statusul la feedback pt ca nu putem da feedback vanzator-cumparator si cumparator-vanzator
         if tranzactie.buyer_id == user_curent.id_user:
-            if len(Feedback.query.filter_by(id_seller=tranzactie.seller_id, id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='cumparator').all())==0:
-                feedback_1 = Feedback(feedback_text=feedback,rating=rating,id_seller=tranzactie.seller_id,id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='cumparator')
+            if len(Feedback.query.filter_by(id_seller=tranzactie.seller_id, id_buyer=tranzactie.buyer_id,
+                                            id_product=tranzactie.product_id, status='cumparator').all()) == 0:
+                feedback_1 = Feedback(feedback_text=feedback, rating=rating, id_seller=tranzactie.seller_id,
+                                      id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,
+                                      status='cumparator')
                 db.session.add(feedback_1)
                 vanzator = User.query.filter_by(id_user=tranzactie.seller_id).first()
                 vanzator.seller_rating = (vanzator.seller_rating * vanzator.nr_seller_ratings + int(rating)) / (
-                            vanzator.nr_seller_ratings + 1)
+                        vanzator.nr_seller_ratings + 1)
                 vanzator.nr_seller_ratings += 1
                 db.session.commit()
             else:
                 flash('Ai dat deja feedback pentru aceasta tranzactie!', 'warning')
                 return redirect(url_for('view_transactions'))
 
-
         if tranzactie.seller_id == user_curent.id_user:
-            if len(Feedback.query.filter_by(id_seller=tranzactie.seller_id, id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='vanzator').all())==0:
-                feedback_1 = Feedback(feedback_text=feedback, rating=rating, id_seller=tranzactie.seller_id,id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id,status='vanzator')
+            if len(Feedback.query.filter_by(id_seller=tranzactie.seller_id, id_buyer=tranzactie.buyer_id,
+                                            id_product=tranzactie.product_id, status='vanzator').all()) == 0:
+                feedback_1 = Feedback(feedback_text=feedback, rating=rating, id_seller=tranzactie.seller_id,
+                                      id_buyer=tranzactie.buyer_id, id_product=tranzactie.product_id, status='vanzator')
                 db.session.add(feedback_1)
                 cumparator = User.query.filter_by(id_user=tranzactie.buyer_id).first()
                 cumparator.buyer_rating = (cumparator.buyer_rating * cumparator.nr_buyer_ratings + int(rating)) / (
-                            cumparator.nr_buyer_ratings + 1)
+                        cumparator.nr_buyer_ratings + 1)
                 cumparator.nr_buyer_ratings += 1
                 db.session.commit()
             else:
                 flash('Ai dat deja feedback pentru aceasta tranzactie!', 'warning')
-                return redirect( url_for('view_transactions'))
-
-
+                return redirect(url_for('view_transactions'))
 
         return redirect(url_for('view_transactions'))
     else:
-        return render_template('feedback.html', tranzactie=tranzactie, user_curent=user_curent)
+
+        try:
+            vanzator = User.query.filter_by(id_user = tranzactie.seller_id).first()
+            cumparator = User.query.filter_by(id_user = tranzactie.buyer_id).first()
+        except AttributeError:
+            flash('Cale gresita!','warning')
+            return render_template('transactions.html')
+
+        return render_template('feedback.html', tranzactie=tranzactie, user_curent=user_curent, vanzator=vanzator, cumparator=cumparator)
 
 
 @app.route('/view_feedbacks', methods=['GET', 'POST'])
-
 def view_feedback():
-    feedbacks=Feedback.query.all()
-    users=User.query.all()
+    feedbacks = Feedback.query.all()
+    users = User.query.all()
     if feedbacks is None:
         flash('Nu ai niciun feedback!', 'warning')
         return render_template('view_feedbacks.html')
     else:
-        feedbacks_vanzator={}
-        feedbacks_cumparator={}
+        feedbacks_vanzator = {}
+        feedbacks_cumparator = {}
         for feedback in feedbacks:
-            if feedback.status=='vanzator':
-                user=User.query.filter_by(id_user=feedback.id_buyer).first()
+            if feedback.status == 'vanzator':
+                user = User.query.filter_by(id_user=feedback.id_buyer).first()
                 if user not in feedbacks_cumparator:
-                    feedbacks_cumparator[user]=[feedback]
+                    feedbacks_cumparator[user] = [feedback]
                 else:
                     feedbacks_cumparator[user].append(feedback)
-            if feedback.status=='cumparator':
-                user=User.query.filter_by(id_user=feedback.id_seller).first()
+            if feedback.status == 'cumparator':
+                user = User.query.filter_by(id_user=feedback.id_seller).first()
                 if user not in feedbacks_vanzator:
-                    feedbacks_vanzator[user]=[feedback]
+                    feedbacks_vanzator[user] = [feedback]
                 else:
                     feedbacks_vanzator[user].append(feedback)
-        return render_template('view_feedbacks.html',users=users,feedbacks_vanzator=feedbacks_vanzator, feedbacks_cumparator=feedbacks_cumparator)
-
-
-
+        return render_template('view_feedbacks.html', users=users, feedbacks_vanzator=feedbacks_vanzator,
+                               feedbacks_cumparator=feedbacks_cumparator)
 
 
 #

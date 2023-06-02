@@ -3,29 +3,77 @@
 <head>
     <title>Feedbacks</title>
 </head>
-<body>
-    <h1>Feedbacks</h1>
-{% for user in users %}
 
-    {% if user.id_user!=0 %}
-         <div>Numele {{ user.username }}</div>
-           <div>Vanzator</div>
-              {% if user in feedbacks_vanzator %}
-                  <div>Rating Vanzator user {{ user.seller_rating }}</div>
-                    {% for feedback in feedbacks_vanzator[user] %}
-                       <div>Feedback:{{ feedback.feedback_text }}</div>
-                        <div>Rating:{{ feedback.rating }}</div>
-                    {% endfor %}
-                {% endif %}
-          <div>Cumparator</div>
-            {% if user in feedbacks_cumparator %}
-                <div>Rating Cumparator user {{ user.buyer_rating }}</div>
-                    {% for feedback in feedbacks_cumparator[user] %}
-                       <div>Feedback:{{ feedback.feedback_text }}</div>
-                        <div>Rating:{{ feedback.rating }}</div>
-                    {% endfor %}
-                {% endif %}
+<header>
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li>
+                <a href="/posts">Posts</a>
+                <ul class="sub-menu">
+                    <li><a href="/create_post">Add Post</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/auctions">Auctions</a>
+                <ul class="sub-menu">
+                    <li><a href="/auctions/create">Add Auction</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/login">Login</a>
+                <ul class="sub-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/products">Products</a>
+                <ul class="sub-menu">
+                    <li><a href="/add_product">Add Product</a></li>
+                </ul>
+            </li>
+            <li><a href="/view_questions">Questions</a></li>
+            <li><a href="/messages">Messages</a>
+            <ul class="sub-menu">
+                <li><a href="/send_message">Send Message</a></li>
+                <li><a href="/view_feedbacks">View Feedbacks</a></li>
+                <li><a href="/give_feedback">Give Feedback</a></li>
+            </ul>
+            </li>
+        </ul>
+    </div>
+</header>
+<body>
+<link rel="stylesheet" href="/../static/view_feedbacks.css">
+<h1>Feedbacks</h1>
+{% for user in users %}
+    {% if user.id_user!=0 and user.seller_rating %}
+    <div id="casuta_prime">
+    <div id="nume">Numele {{ user.username }}</div>
+    </br>
+    <div>Vanzator</div>
+    </br>
+    {% if user in feedbacks_vanzator %}
+    <div id="rating_vanzator_user">Rating Vanzator user {{ user.seller_rating }}</div>
+    {% for feedback in feedbacks_vanzator[user] %}
+    <div id="feedbackv">Feedback:{{ feedback.feedback_text }}</div>
+    <div id="ratingv">Rating:{{ feedback.rating }}</div>
+    {% endfor %}
     {% endif %}
+    </br>
+    <div>Cumparator</div>
+    </br>
+    {% if user in feedbacks_cumparator %}
+    <div id="rating_cumparator_user">Rating Cumparator user {{ user.buyer_rating }}</div>
+    {% for feedback in feedbacks_cumparator[user] %}
+    <div id="feedbackc">Feedback:{{ feedback.feedback_text }}</div>
+    <div id="ratingc">Rating:{{ feedback.rating }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+</div>
+<br>
 {% endfor %}
 
 </body>
