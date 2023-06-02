@@ -1,0 +1,26 @@
+body{
+    background-image: url("/static/Images/v944-bb-16-job598.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center top;
+
+}
+
+
+#casuta_prime{
+    font-weight: lighter;
+    font-family: Ubuntu, serif;
+    font-size: 20px;
+    position: relative;
+    margin: auto;
+    border: 1px solid #3B666B;
+    padding: 20px;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    background-size: cover;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
