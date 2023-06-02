@@ -24,6 +24,7 @@ body{
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
 .custom-button {
     background-color: #E1F3E8;
     border: none;
@@ -41,4 +42,70 @@ body{
 .custom-button:hover {
     background-color: #B5E0C7;
 }
+
+.navbar {
+            background-color: #E1F3E8;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .navbar li {
+            position: relative;
+            margin-right: 60px;
+        }
+
+        .navbar li:last-child {
+            margin-right: 0;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #000000;
+            transition: color 0.3s;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 21px;
+        }
+
+        .navbar a:hover {
+            color: #B5E0C7;
+        }
+
+        .navbar .sub-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #E1F3E8;
+            padding: 10px;
+            z-index: 999;
+        }
+
+        .navbar li:hover .sub-menu {
+            display: block;
+        }
+
+        .navbar .sub-menu li {
+            margin-right: 0;
+        }
+
+        .navbar .sub-menu a {
+
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 19px;
+        }
+
+        .navbar .sub-menu a:hover {
+            color: #B5E0C7;
+        }
+
 

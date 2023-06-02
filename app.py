@@ -927,7 +927,15 @@ def give_feedback():
 
         return redirect(url_for('view_transactions'))
     else:
-        return render_template('feedback.html', tranzactie=tranzactie, user_curent=user_curent)
+
+        try:
+            vanzator = User.query.filter_by(id_user = tranzactie.seller_id).first()
+            cumparator = User.query.filter_by(id_user = tranzactie.buyer_id).first()
+        except AttributeError:
+            flash('Cale gresita!','warning')
+            return render_template('transactions.html')
+
+        return render_template('feedback.html', tranzactie=tranzactie, user_curent=user_curent, vanzator=vanzator, cumparator=cumparator)
 
 
 @app.route('/view_feedbacks', methods=['GET', 'POST'])
