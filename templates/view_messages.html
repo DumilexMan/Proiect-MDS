@@ -5,7 +5,7 @@
 
 </head>
 <body>
-<link rel="stylesheet" href="/../static/view_messages.css">
+<link rel="stylesheet" href="/../static/css/view_messages.css">
 <div class="container">
     <h1>Messages</h1>
     <table>
@@ -13,9 +13,10 @@
         <tr class="message-row {{ value['s/r'] }}">
             <td>{{ key }}</td>
             <td>
-                <ul>
+                <ul id="casuta_mesaje">
                     {% for message in value['messages'] %}
                     <p class="message {{ message['s/r'] }}">{{ message['text'] }}</p>
+
                     {% endfor %}
                 </ul>
                 <br>
