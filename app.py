@@ -673,9 +673,11 @@ def questions():
                         flash('Raspunsul a fost sters cu succes!', 'success')
                         return redirect(url_for('questions'))
 
-            dict[(question.id_question, question.question_text, question.id_user, user_intrebare.email)].append(
-                (raspuns.answer_text, raspuns.id_user, raspuns.id_answer, user_raspuns.email))
-    return render_template('view_questions.html', intrebari_raspunsuri=dict, user_curent=current_user)
+            if (question.id_question,question.question_text,question.id_user,user_intrebare.email) in dict:
+                dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email))
+            else:
+                dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)]=[(raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email)]
+    return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
 
 
 # Functie pentru trimis mesaje
