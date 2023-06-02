@@ -16,9 +16,11 @@
 <div id="casuta_prime">
     <h1>Trimite mesaj</h1>
     <form action="" method="post">
-        <input type="message_text" name='receiver_name' value={{ nume }}><br><br>
+        <input type="message_text" name="receiver_name" value="{% if nume %}{{ nume }}{% else %}receiver_name{% endif %}">
+<br><br>
         <textarea name="message_text" rows="5"></textarea><br><br>
-        <input type="submit" value="Trimite">
+        <input type="submit" class="custom-button" value="Trimite">
+
     </form>
 </div>
 

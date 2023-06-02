@@ -1,13 +1,12 @@
-body{
+body {
     background-image: url("/static/Images/v944-bb-16-job598.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center top;
-
 }
 
 
-#casuta_prime{
+#casuta_prime {
     font-weight: lighter;
     font-family: Ubuntu, serif;
     font-size: 20px;
@@ -24,6 +23,38 @@ body{
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+
+#cumparator {
+    font-weight: lighter;
+    font-family: Ubuntu, serif;
+    font-size: 20px;
+    position: relative;
+    margin: auto;
+    border: 1px solid #3B663B;
+    width: 30%;
+    text-align: center;
+    border-radius: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: rgba(48, 121, 155, 0.3);
+}
+
+#vanzator {
+    font-weight: lighter;
+    font-family: Ubuntu, serif;
+    font-size: 20px;
+    position: relative;
+    margin: auto;
+    border: 1px solid #3B663B;
+    width: 30%;
+    text-align: center;
+    border-radius: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: rgba(48, 121, 155, 0.3);
+}
+
 .custom-button {
     background-color: #E1F3E8;
     border: none;

@@ -4,28 +4,35 @@
     <title>Feedbacks</title>
 </head>
 <body>
-    <h1>Feedbacks</h1>
+<link rel="stylesheet" href="/../static/view_feedbacks.css">
+<h1>Feedbacks</h1>
 {% for user in users %}
-
-    {% if user.id_user!=0 %}
-         <div>Numele {{ user.username }}</div>
-           <div>Vanzator</div>
-              {% if user in feedbacks_vanzator %}
-                  <div>Rating Vanzator user {{ user.seller_rating }}</div>
-                    {% for feedback in feedbacks_vanzator[user] %}
-                       <div>Feedback:{{ feedback.feedback_text }}</div>
-                        <div>Rating:{{ feedback.rating }}</div>
-                    {% endfor %}
-                {% endif %}
-          <div>Cumparator</div>
-            {% if user in feedbacks_cumparator %}
-                <div>Rating Cumparator user {{ user.buyer_rating }}</div>
-                    {% for feedback in feedbacks_cumparator[user] %}
-                       <div>Feedback:{{ feedback.feedback_text }}</div>
-                        <div>Rating:{{ feedback.rating }}</div>
-                    {% endfor %}
-                {% endif %}
+    {% if user.id_user!=0 and user.seller_rating %}
+    <div id="casuta_prime">
+    <div id="nume">Numele {{ user.username }}</div>
+    </br>
+    <div>Vanzator</div>
+    </br>
+    {% if user in feedbacks_vanzator %}
+    <div id="rating_vanzator_user">Rating Vanzator user {{ user.seller_rating }}</div>
+    {% for feedback in feedbacks_vanzator[user] %}
+    <div id="feedbackv">Feedback:{{ feedback.feedback_text }}</div>
+    <div id="ratingv">Rating:{{ feedback.rating }}</div>
+    {% endfor %}
     {% endif %}
+    </br>
+    <div>Cumparator</div>
+    </br>
+    {% if user in feedbacks_cumparator %}
+    <div id="rating_cumparator_user">Rating Cumparator user {{ user.buyer_rating }}</div>
+    {% for feedback in feedbacks_cumparator[user] %}
+    <div id="feedbackc">Feedback:{{ feedback.feedback_text }}</div>
+    <div id="ratingc">Rating:{{ feedback.rating }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+</div>
+<br>
 {% endfor %}
 
 </body>

@@ -15,9 +15,11 @@
             <td>
                 <ul>
                     {% for message in value['messages'] %}
-                    <li class="message {{ message['s/r'] }}">{{ message['text'] }}</li>
+                    <p class="message {{ message['s/r'] }}">{{ message['text'] }}</p>
                     {% endfor %}
                 </ul>
+                <br>
+
             </td>
         </tr>
         {% endfor %}
