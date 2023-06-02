@@ -1,54 +1,194 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Informatii</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <!--    <link rel="stylesheet" href="static/css/aux.css">-->
+    <link rel="stylesheet" href="static/css/menu.css">
+    <style>
+        .input-label-custom {
+            padding-left: 15px;
+            font-weight: lighter;
+        }
+
+        ul, ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            background-image: url("/static/images/v944-bb-16-job598.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 20px 20px;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            display: flex;
+            margin-bottom: 20px;
+            margin-top: 8vh;
+            overflow-y: scroll;
+            height: 80vh;
+        }
+
+        .custom-button {
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 2em;
+        }
+
+        .custom-button:hover {
+            background-color: #B5E0C7;
+        }
+
+        .scris {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 33px;
+        }
+    </style>
 </head>
+
 <body>
-<form action=""  method="post">
-        <label>Pune Intrebare</label>
-            <textarea name="question_text" rows="5"></textarea><br><br>
-      <input type="submit" name="Intrebare_Submit" value="Trimite">
-    </form>
+<header>
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li>
+                <a href="/posts">Posts</a>
+                <ul class="sub-menu">
+                    <li><a href="/create_post">Add Post</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/auctions">Auctions</a>
+                <ul class="sub-menu">
+                    <li><a href="/auctions/create">Add Auction</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/login">Login</a>
+                <ul class="sub-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/products">Products</a>
+                <ul class="sub-menu">
+                    <li><a href="/add_product">Add Product</a></li>
+                </ul>
+            </li>
+            <li><a href="/view_questions">Questions</a></li>
+            <li><a href="/messages">Messages</a>
+            <ul class="sub-menu">
+                <li><a href="/send_message">Send Message</a></li>
+                <li><a href="/send_message">Send Message</a></li>
+            </ul>
+            </li>
+        </ul>
+    </div>
+</header>
 
 <div class="container">
-  <h2>Questions and Answers</h2>
-  <hr>
-  {% for (question_id, question_text, id_user, username_intrebare), answers in intrebari_raspunsuri.items() %}
-  <div class="question">
-    <div>
-        <h4>{{ question_text }}</h4>
-        <p>{{ username_intrebare }}</p> <!-- Corrected variable name -->
-    </div>
-  {% if user_curent.id_user == id_user %}
+
+
+    <h2 class="scris">Questions and Answers</h2>
+    <hr>
     <form action="" method="post">
-    <input type="submit" name={{"Delete"}}{{ question_id }} value="Sterge">
+        <div class="mb-3 position-relative">
+            <input type="text" class="form-control" name="question_text" id="question_text" required>
+            <label for="question_text" class="input-label-custom">Pune Intrebare</label>
+        </div>
+        <button type="submit" name="Intrebare_Submit" class="custom-button">Trimite</button>
     </form>
-  {% endif %}
-  {% if user_curent.is_authenticated and user_curent.id_user != id_user %}
-  <form action="" method="post">
-  <label>Raspunde</label>
-  <textarea name={{"answer"}}{{ question_id }} rows="5"></textarea><br><br>
-    <input type="submit" name={{"Raspuns"}}{{ question_id }} value="Trimite">
-  </form>
-  {% endif %}
-    {% if answers %}
-    <ul>
-      {% for (answer_text, id_user, answer_id, username_raspuns) in answers %}
-          <li>{{ answer_text }}</li>
-          <li>{{ username_raspuns }}</li>
-          {% if user_curent.id_user == id_user %}
+
+    {% for (question_id, question_text, id_user, username_intrebare), answers in intrebari_raspunsuri.items() %}
+    <div class="card my-4">
+        <div class="card-body">
+            <h4 class="card-title">Question: "{{ question_text }}"</h4>
+            <p class="card-text">User: {{ username_intrebare }}</p>
+
+            {% if user_curent.id_user == id_user %}
             <form action="" method="post">
-              <input type="submit" name={{"Sterge"}}{{ answer_id }} value="Sterge">
+                <input type="submit" name="Delete{{ question_id }}" class="custom-button" value="Sterge">
             </form>
-          {% endif %}
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p>No answers yet</p>
-    {% endif %}
-  </div>
-  {% endfor %}
+            {% endif %}
+
+            {% if user_curent.is_authenticated and user_curent.id_user != id_user %}
+            <form action="" method="post">
+                <div class="mb-3 position-relative">
+                    <input type="text" class="form-control" name="answer{{ question_id }}" id="answer{{ question_id }}"
+                           required>
+                    <label for="answer{{ question_id }}" class="input-label-custom">Raspunde</label>
+                </div>
+                <button type="submit" name="Raspuns{{ question_id }}" class="custom-button">Trimite</button>
+            </form>
+            {% endif %}
+
+            {% if answers %}
+            <ul>
+                {% for (answer_text, id_user, answer_id, username_raspuns) in answers %}
+                <li>Answear: "{{ answer_text }}"</li>
+                <li>User: {{ username_raspuns }}</li>
+                {% if user_curent.id_user == id_user %}
+                <form action="" method="post">
+                    <input type="submit" name="Sterge{{ answer_id }}" class="custom-button" value="Sterge">
+                </form>
+                {% endif %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No answers yet</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
 </div>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var inputLabels = document.querySelectorAll(".input-label-custom");
+
+        Array.prototype.forEach.call(inputLabels, function (label) {
+            var input = label.previousElementSibling;
+
+            input.addEventListener("input", function () {
+                if (input.value !== "") {
+                    label.style.display = "none";
+                } else {
+                    label.style.display = "block";
+                }
+            });
+        });
+    });
+
+</script>
 </body>
+
 </html>

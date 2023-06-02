@@ -5,257 +5,144 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
-    
+    <link rel="stylesheet" href="static/css/aux.css">
+    <link rel="stylesheet" href="static/css/menu.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Adăugați linkurile către fișierele CSS ale Slick Carousel -->
+    <link rel="stylesheet" type="text/css" href="static/css/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="static/css/slick-theme.css"/>
+    <!-- Adăugați linkurile către fișierele CSS ale bibliotecii Slick Carousel -->
+    <!--    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick.css"/>-->
+    <!--    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick-theme.css"/>-->
+
+
+    <!-- Adăugați linkul către fișierul JavaScript al Slick Carousel -->
+    <script type="text/javascript" src="static/js/slick.min.js"></script>
+    <!-- Adăugați linkul către fișierul JavaScript al bibliotecii Slick Carousel -->
+    <!--    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick.min.js"></script>-->
+
     <style>
-        body {
-            background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 100%);
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            font-family: "Open Sans", sans-serif;
-            color: #333333;
-        }
-
-        .box-form {
-            margin: 0 auto;
+        .gallery {
             width: 80%;
-            background: yellow;
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            flex: 1 1 100%;
-            align-items: stretch;
-            justify-content: space-between;
-            box-shadow: 0 0 20px 6px #090b6f85;
+            margin: 0 auto;
+            padding-top: 100px;
+            /*position: relative;*/
+            text-align: center; /* Adăugăm poziționarea relativă pentru a poziționa sloganul */
         }
 
-        @media (max-width: 980px) {
-            .box-form {
-                flex-flow: wrap;
-                text-align: center;
-                align-content: center;
-                align-items: center;
-            }
-        }
-
-        .box-form div {
-            height: auto;
-        }
-
-        .box-form .left {
-            color: #FFFFFF;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-image: url("https://sites.google.com/site/tineriispecialisti/_/rsrc/1461648699458/home/vhvgbj/licitatie-publica-generic1.jpg");
-            overflow: hidden;
-        }
-
-        .box-form .left .overlay {
-            padding: 30px;
-            width: 100%;
-            height: 100%;
-            background: #5961f9ad;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-
-        .box-form .left .overlay h1 {
-            font-size: 10vmax;
-            line-height: 1;
-            font-weight: 900;
-            margin-top: 40px;
-            margin-bottom: 20px;
-        }
-
-        .box-form .left .overlay span p {
-            margin-top: 30px;
-            font-weight: 900;
-        }
-
-        .box-form .left .overlay span a {
-            background: #3b5998;
-            color: #FFFFFF;
-            margin-top: 10px;
-            padding: 14px 50px;
-            border-radius: 100px;
-            display: inline-block;
-            box-shadow: 0 3px 6px 1px #042d4657;
-        }
-
-        .box-form .right {
-            padding: 40px;
-            overflow: hidden;
-        }
-        @media (max-width: 980px) {
-            .box-form .right {
-                width: 100%;
-            }
-        }
-        .box-form .right h5 {
-            line-height: 1;
+        .gallery-cell {
+            display: none;
             text-align: center;
-            font-size: 400%;
         }
 
-       .box-form #button {
-        outline: 0;
-        background-color: #403a99;
-        border: none;
-        color:#FFFFFF;
-        padding: 15px 32px;
-        text-align: center;
-        display: inline-block;
-        font-size: 100%;
+        .gallery-cell img {
+            /*margin-top: 50px;*/
+            margin-left: 200px;
+            transition: opacity 0.5s ease-in-out;
+            width: 70%;
+            height: 70%; /* Specificați înălțimea dorită a imaginii */
+            object-fit: cover; /* Pentru a asigura că imaginea ocupă complet spațiul */
+            /*object-position: center; !* Pentru a asigura că centrul imaginii este poziționat în centrul containerului *!*/
+
         }
+
+        .slogan {
+            position: absolute;
+            color: black;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 35px;
+            margin-top: 300px;
+            text-align: center;
+            margin-bottom: 20px;
+
+
+        }
+
+        .slick-initialized .gallery-cell {
+            display: block;
+        }
+
+
     </style>
 </head>
 <body>
-    <link rel="stylesheet" type="text/css" href="./index.html" />
-
-        <div class="right">
-            <h5>Home Page</h5>
-                <button id="button" onclick="window.location.href='messages'">Go to Messages</button>
-                <br>
-                <h1>Meniu:</h1>
-                <br>
-                <a href="add_product">add_product</a>
-                <br>
-                <a href="auctions#int:id_auction">auction</a>
-                <br>
-                <a href="auctions">auctions</a>
-                <br>
-                <a href="auctions/create">create_auction</a>
-                <br>
-                <a href="auctions#id_auction/create_bid">create_bid</a>
-                <br>
-                <a href="create_post">create_post</a>
-                <br>
-                <a href="dashboard">dashboard</a>
-                <br>
-                <a href="edit_data">edit_data</a>
-                <br>
-                <a href="login">login</a>
-                <br>
-                <a href="posts#id_post">post</a>
-                <br>
-                <a href="posts">posts</a>
-                <br>
-                <a href="register">register</a>
-                <br>
-                <a href="send_message">send_message</a>
-                <br>
-                <a href="messages">view_messages</a>
-                <br>
-                <a href="view_questions">view_questions</a>
-            </div>
+<header>
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li>
+                <a href="/posts">Posts</a>
+                <ul class="sub-menu">
+                    <li><a href="/create_post">Add Post</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/auctions">Auctions</a>
+                <ul class="sub-menu">
+                    <li><a href="/auctions/create">Add Auction</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/login">Login</a>
+                <ul class="sub-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/products">Products</a>
+                <ul class="sub-menu">
+                    <li><a href="/add_product">Add Product</a></li>
+                </ul>
+            </li>
+            <li><a href="/view_questions">Questions</a></li>
+            <li><a href="/messages">Messages</a>
+            <ul class="sub-menu">
+                <li><a href="/send_message">Send Message</a></li>
+                <li><a href="/view_feedbacks">View Feedbacks</a></li>
+                <li><a href="/give_feedback">Give Feedback</a></li>
+            </ul>
+            </li>
+        </ul>
     </div>
-    <br><br>
+</header>
+
+<div class="gallery">
+    <div class="slogan">
+        Power Up Your Deals: Auctions and Ads, All in One Place!
+    </div>
+    <div class="gallery-cell">
+        <img src="static/images/auction-g2c57c4df8_640.png" alt="Image 1">
+    </div>
+    <div class="gallery-cell">
+        <img src="static/images/wordpress-g25e1e335e_640.jpg" alt="Image 2">
+    </div>
+    <div class="gallery-cell">
+        <img src="static/images/e-commerce-g36d1763c0_640.jpg" alt="Image 3">
+    </div>
+    <!-- Adăugați mai multe slide-uri cu imagini de eșantion -->
+
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        // Initializează galeria foto Slick Carousel
+        $('.gallery').slick({
+            dots: false,
+            arrows: false,
+            infinite: true,
+            speed: 500,
+            fade: true,
+            cssEase: 'linear',
+            autoplay: true,
+            autoplaySpeed: 3000
+        });
+    });
+</script>
+
 </body>
-
-
-<style>
-
-    body {
-    background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 100%);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    font-family: "Open Sans", sans-serif;
-    color: #333333;
-}
-
-.box-form {
-    margin: 0 auto;
-    width: 80%;
-    background: yellow;
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    flex: 1 1 100%;
-    align-items: stretch;
-    justify-content: space-between;
-    box-shadow: 0 0 20px 6px #090b6f85;
-}
-
-@media (max-width: 980px) {
-    .box-form {
-        flex-flow: wrap;
-        text-align: center;
-        align-content: center;
-        align-items: center;
-    }
-}
-
-.box-form div {
-    height: auto;
-}
-
-.box-form .left {
-    color: #FFFFFF;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-image: url("https://sites.google.com/site/tineriispecialisti/_/rsrc/1461648699458/home/vhvgbj/licitatie-publica-generic1.jpg");
-    overflow: hidden;
-}
-
-.box-form .left .overlay {
-    padding: 30px;
-    width: 100%;
-    height: 100%;
-    background: #5961f9ad;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.box-form .left .overlay h1 {
-    font-size: 10vmax;
-    line-height: 1;
-    font-weight: 900;
-    margin-top: 40px;
-    margin-bottom: 20px;
-}
-
-.box-form .left .overlay span p {
-    margin-top: 30px;
-    font-weight: 900;
-}
-
-.box-form .left .overlay span a {
-    background: #3b5998;
-    color: #FFFFFF;
-    margin-top: 10px;
-    padding: 14px 50px;
-    border-radius: 100px;
-    display: inline-block;
-    box-shadow: 0 3px 6px 1px #042d4657;
-}
-
-.box-form .right {
-    padding: 40px;
-    overflow: hidden;
-}
-@media (max-width: 980px) {
-    .box-form .right {
-        width: 100%;
-    }
-}
-.box-form .right h5 {
-    line-height: 1;
-    text-align: center;
-    font-size: 400%;
-}
-
-.box-form #button {
-outline: 0;
-background-color: #403a99;
-border: none;
-color:#FFFFFF;
-padding: 15px 32px;
-text-align: center;
-display: inline-block;
-font-size: 100%;
-}
-
-</style>
-
 </html>

@@ -1,55 +1,181 @@
-
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Dashboard</title>
-  </head>
-  <body>
-    <h1>Welcome, {{ current_user.username }}!</h1>
-    <p>Your email is {{ current_user.email }}.</p>
-    <p>Your name is {{ current_user.name }}.</p>
-    <p>Your address is {{ current_user.address }}.</p>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    <a href="{{ url_for('edit_data') }}">Edit</a>
-    <h1>Posts owned by you</h1>
-    <ul>
-        {% for post in posts %}
-        <li>
-            <h2>{{ post.title }}</h2>
-            <p>{{ post.description }}</p>
-            <p>Price: {{ post.price }}</p>
-            <p>Status: {{ post.status }}</p>
-            <a href="{{ url_for('get_post', post_id=post.id_post) }}">Access post</a>
-        </li>
-        {% endfor %}
-    </ul>
-      <h1>Products owned by you</h1>
-        <ul>
-            {% for product in products %}
-            <li>
-                <h2>{{ product.name }}</h2>
-                <p>ID: {{ product.id_product }}</p>
-                <p>Value: {{ product.price }}</p>
-                <p>Category: {{ product.category }}</p>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="static/fonts/material-icon/css/material-design-iconic-font.min.css">
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        .profile {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            padding: 20px 20px;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            display: flex;
+            overflow-y: auto;
+            margin-bottom: 20px; /* adaugă un spațiu de 20px în partea de jos */
+            max-height: calc(100vh - 200px);
+        }
+
+        .container > * {
+            flex-shrink: 0;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .sub-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li::before {
+            content: "";
+        }
+
+        body {
+            background-image: url("static/images/v944-bb-16-job598.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .custom-button {
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 10px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1em;
+            width: 220px;
+        }
+
+        .custom-button:hover {
+            background-color: #B5E0C7;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: center;
+        }
+
+
+    </style>
+</head>
+
+<body>
+
+<section class="profile">
+    <div class="container">
+        <h1 class="title">Welcome, {{ current_user.username }}!</h1>
+        <p>Your email is {{ current_user.email }}.</p>
+        <p>Your name is {{ current_user.name }}.</p>
+        <p>Your address is {{ current_user.address }}.</p>
+        <div class="form-group">
+            <input type="button" onclick="window.location.href='/edit_data'" value="Edit Profile"
+                   class="custom-button">
+        </div>
+
+        <div class="form-group">
+            <input type="button" onclick="window.location.href='/logout'" value="Logout"
+                   class="custom-button">
+        </div>
+        <div class="form-group">
+            <input type="button" onclick="window.location.href='/'" value="Go to Home Page"
+                   class="custom-button">
+        </div>
+
+        <h2 class="sub-title">Your Posts:</h2>
+        <ul class="list-group">
+            {% for post in posts %}
+            <li class="list-group-item">
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.description }}</p>
+                <p>Price: {{ post.price }}</p>
+                <p>Status: {{ post.status }}</p>
+                <div class="form-group">
+                    <input type="button"
+                           onclick="window.location.href='{{ url_for('get_post', post_id=post.id_post) }}'"
+                           value="Access post" class="custom-button">
+                </div>
             </li>
             {% endfor %}
         </ul>
-  </ul>
-      <h1>Auctions started by you</h1>
-        <ul>
+
+        <h2 class="sub-title">Your Auctions:</h2>
+        <ul class="list-group">
             {% for auction in auctions %}
-            <li>
-                <h2>{{ auction.title }}</h2>
+            <li class="list-group-item">
+                <h3>{{ auction.title }}</h3>
                 <p>ID: {{ auction.id_auction }}</p>
-                   <p>Starting price: {{ auction.starting_price }}</p>
-                    <p>Current price: {{ auction.curent_price }}</p>
-                    <p>Start date: {{ auction.start_date }}</p>
-                    <p>End date: {{ auction.end_date }}</p>
-                    <p>Status: {{ auction.status }}</p>
-                    <p>Winner_id: {{ auction.winner_id }}</p>
-                    <p>description: {{ auction.description }}</p>
+                <p>Starting price: {{ auction.starting_price }}</p>
+                <p>Current price: {{ auction.current_price }}</p>
+                <p>Start date: {{ auction.start_date }}</p>
+                <p>End date: {{ auction.end_date }}</p>
+                <p>Status: {{ auction.status }}</p>
+                <p>Winner ID: {{ auction.winner_id }}</p>
+                <p>Description: {{ auction.description }}</p>
+                <div class="form-group">
+                    <input type="button"
+                           onclick="window.location.href='{{ url_for('get_auction', id_auction=auction.id_auction) }}'"
+                           value="Access auction" class="custom-button">
+                </div>
             </li>
             {% endfor %}
         </ul>
-  </body>
+        <h2 class="sub-title">Your Products:</h2>
+        <ul class="list-group">
+            {% for product in products %}
+            <li class="list-group-item">
+                <h3>{{ product.name }}</h3>
+                <p>Id: {{ product.id_product}}</p>
+                <p>Price: {{ product.price}}</p>
+                <p>Category: {{ product.category}}</p>
+            </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+</section>
+
+<!-- JS -->
+<script src="static/vendor/jquery/jquery.min.js"></script>
+<script src="static/js/main.js"></script>
+</body>
+
 </html>
