@@ -6,297 +6,62 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
-    <style>body {
-  background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 100%);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  font-family: "Open Sans", sans-serif;
-  color: #333333;
-}
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="static/fonts/material-icon/css/material-design-iconic-font.min.css">
 
-.box-form {
-  margin: 0 auto;
-  width: 90%;
-  background: yellow;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  flex: 1 1 100%;
-  align-items: stretch;
-  justify-content: space-between;
-  box-shadow: 0 0 20px 6px #090b6f85;
-}
-@media (max-width: 980px) {
-  .box-form {
-    flex-flow: wrap;
-    text-align: center;
-    align-content: center;
-    align-items: center;
-  }
-}
-.box-form div {
-  height: auto;
-}
-.box-form .left {
-  color: #FFFFFF;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-image: url("https://sites.google.com/site/tineriispecialisti/_/rsrc/1461648699458/home/vhvgbj/licitatie-publica-generic1.jpg");
-  overflow: hidden;
-}
-.box-form .left .overlay {
-  padding: 30px;
-  width: 100%;
-  height: 100%;
-  background: #5961f9ad;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.box-form .left .overlay h1 {
-  font-size: 10vmax;
-  line-height: 1;
-  font-weight: 900;
-  margin-top: 40px;
-  margin-bottom: 20px;
-}
-.box-form .left .overlay span p {
-  margin-top: 30px;
-  font-weight: 900;
-}
-.box-form .left .overlay span a {
-  background: #3b5998;
-  color: #FFFFFF;
-  margin-top: 10px;
-  padding: 14px 50px;
-  border-radius: 100px;
-  display: inline-block;
-  box-shadow: 0 3px 6px 1px #042d4657;
-}
-.box-form .left .overlay span a:last-child {
-  background: #1dcaff;
-  margin-left: 30px;
-}
-.box-form .right {
-  padding: 40px;
-  overflow: hidden;
-}
-@media (max-width: 980px) {
-  .box-form .right {
-    width: 100%;
-  }
-}
-.box-form .right h5 {
-  font-size: 6vmax;
-  line-height: 0;
-}
-.box-form .right p {
-  font-size: 14px;
-  color: #B0B3B9;
-}
-.box-form .right .inputs {
-  overflow: hidden;
-}
-.box-form .right input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 25px;
-  font-size: 16px;
-  border: none;
-  outline: none;
-  border-bottom: 2px solid #B0B3B9;
-}
-.box-form .right .remember-me--forget-password {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.box-form .right .remember-me--forget-password input {
-  margin: 0;
-  margin-right: 7px;
-  width: auto;
-}
-.box-form .right button {
-  float: right;
-  color: #fff;
-  font-size: 16px;
-  padding: 12px 35px;
-  border-radius: 50px;
-  display: inline-block;
-  border: 0;
-  outline: 0;
-  box-shadow: 0px 4px 20px 0px #49c628a6;
-  background-image: linear-gradient(135deg, #70F570 10%, #49C628 100%);
-}</style>
+    <!-- Main css -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/_aux.css">
+
+
+
 </head>
 
 
 <body>
-<link rel="stylesheet" type="text/css" href="./register.css" />
-<div class="box-form">
-	<div class="left">
-		<div class="overlay">
-		<h1>Licitatii Web Site</h1>
-		</div>
-	</div>
+
+<!--<div class="main">-->
+<!-- Sign up form -->
+<section class="signup">
+    <div class="container">
+        <div class="signup-content">
+            <div class="signup-form">
+                <h2 class="form-title">Sign up</h2>
+                <form method="POST" action="" class="inputs">
+                    {{ form.hidden_tag() }}
+                    {{ form.username }}
+                    {{ form.password }}
+                    {{ form.email }}
+                    {{ form.name }}
+                    {{ form.address }}
+                    {{ form.submit }}
+                    <div class="text-center text-lg-start mt-4 pt-2">
+                        <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a
+                                href="{{ url_for('login') }}" class="link-danger">Login</a></p>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="button" onclick="window.location.href='/'" value="Go to Home Page"
+                               class="custom-button">
+                    </div>
+                </form>
+            </div>
+            <div class="signup-image">
+
+                <figure><img src="static/images/signup-image.jpg" alt="sign up image"></figure>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--</div>-->
 
 
-		<div class="right">
-		<h5>Register</h5>
-		   <form method="POST" action="" class="inputs">
-        {{ form.hidden_tag() }}
-        {{ form.username }}
-        {{ form.password }}
-        {{ form.email }}
-        {{ form.name }}
-        {{ form.address }}
-        {{ form.submit }}
-    </form>
-
-
-
-           <a href="{{ url_for('login') }}">Already have an account? Log In</a>
-
-
-
-			<br>
-	</div>
-
-</div>
-
-
+<!-- JS -->
+<script src="static/vendor/jquery/jquery.min.js"></script>
+<script src="static/js/main.js"></script>
 </body>
-
-
-
-
-
-
-<style>
-
-    body {
-  background-image: linear-gradient(135deg, #FAB2FF 10%, #1904E5 100%);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  font-family: "Open Sans", sans-serif;
-  color: #333333;
-}
-
-.box-form {
-  margin: 0 auto;
-  width: 80%;
-  background: yellow;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  flex: 1 1 100%;
-  align-items: stretch;
-  justify-content: space-between;
-  box-shadow: 0 0 20px 6px #090b6f85;
-}
-@media (max-width: 980px) {
-  .box-form {
-    flex-flow: wrap;
-    text-align: center;
-    align-content: center;
-    align-items: center;
-  }
-}
-.box-form div {
-  height: auto;
-}
-.box-form .left {
-  color: #FFFFFF;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-image: url("https://sites.google.com/site/tineriispecialisti/_/rsrc/1461648699458/home/vhvgbj/licitatie-publica-generic1.jpg");
-  overflow: hidden;
-}
-.box-form .left .overlay {
-  padding: 30px;
-  width: 100%;
-  height: 100%;
-  background: #5961f9ad;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.box-form .left .overlay h1 {
-  font-size: 10vmax;
-  line-height: 1;
-  font-weight: 900;
-  margin-top: 40px;
-  margin-bottom: 20px;
-}
-.box-form .left .overlay span p {
-  margin-top: 30px;
-  font-weight: 900;
-}
-.box-form .left .overlay span a {
-  background: #3b5998;
-  color: #FFFFFF;
-  margin-top: 10px;
-  padding: 14px 50px;
-  border-radius: 100px;
-  display: inline-block;
-  box-shadow: 0 3px 6px 1px #042d4657;
-}
-.box-form .left .overlay span a:last-child {
-  background: #1dcaff;
-  margin-left: 30px;
-}
-.box-form .right {
-  padding: 40px;
-  overflow: hidden;
-}
-@media (max-width: 980px) {
-  .box-form .right {
-    width: 100%;
-  }
-}
-
-.box-form .right p {
-  font-size: 14px;
-  color: #B0B3B9;
-}
-.box-form .right .inputs {
-  overflow: hidden;
-}
-.box-form .right input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 25px;
-  font-size: 16px;
-  border: none;
-  outline: none;
-  border-bottom: 2px solid #B0B3B9;
-}
-.box-form .right .remember-me--forget-password {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.box-form .right .remember-me--forget-password input {
-  margin: 0;
-  margin-right: 7px;
-  width: auto;
-}
-.box-form .right button {
-  float: right;
-  color: #fff;
-  font-size: 16px;
-  padding: 12px 35px;
-  border-radius: 50px;
-  display: inline-block;
-  border: 0;
-  outline: 0;
-  box-shadow: 0px 4px 20px 0px #49c628a6;
-  background-image: linear-gradient(135deg, #70F570 10%, #49C628 100%);
-}
-
-</style>
-
-
 
 
 </html>

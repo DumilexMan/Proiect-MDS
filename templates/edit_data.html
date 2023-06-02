@@ -1,23 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Edit personal information</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit personal info</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css">
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/menu.css">
+    <link rel="stylesheet" href="static/css/_aux.css">
+    <style>
+        .small-label {
+            opacity: 0.6; /* Reducerea opacității textului */
+            font-size: 12px; /* Dimensiunea mai mică a fontului */
+            padding-left: 15px; /* Adaugă un spațiu la stânga textului */
+            transition: opacity 0.3s, font-size 0.3s, padding-left 0.3s; /* Tranzitie lină a proprietăților */
+            text-align: center; /* Aliniază textul la dreapta */
+
+        }
+
+
+        /* Stiluri pentru câmpurile de intrare active */
+        .form-control:focus + .small-label {
+            display: none;
+        }
+
+        /* Stiluri pentru câmpurile de intrare goale */
+        .form-control:empty + .small-label {
+            display: block;
+        }
+
+        .scris {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 33px;
+        }
+    </style>
 </head>
+
 <body>
-<form method="POST" action="/edit_data">
-    <label for="username">username:</label>
-    <input type="text" id="username" name="username" required><br>
+<header>
+    <div class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li>
+                <a href="/posts">Posts</a>
+                <ul class="sub-menu">
+                    <li><a href="/create_post">Add Post</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/auctions">Auctions</a>
+                <ul class="sub-menu">
+                    <li><a href="/auctions/create">Add Auction</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/login">Login</a>
+                <ul class="sub-menu">
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/register">Register</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="/products">Products</a>
+                <ul class="sub-menu">
+                    <li><a href="/add_product">Add Product</a></li>
+                </ul>
+            </li>
+            <li><a href="/view_questions">Questions</a></li>
+            <li><a href="/messages">Messages</a>
+            <ul class="sub-menu">
+                <li><a href="/send_message">Send Message</a></li>
+                <li><a href="/view_feedbacks">View Feedbacks</a></li>
+                <li><a href="/give_feedback">Give Feedback</a></li>
+            </ul>
+            </li>
+        </ul>
+    </div>
+</header>
+<section class="edit-data">
+    <div class="container">
+        <div class="edit-data-content">
+            <div class="edit-data-form">
+                <h2 class="scris">Edit your personal information</h2>
+                <form method="POST" action="/edit_data" class="edit-form">
+                    <div class="form-group">
+                        <label for="username" class="small-label">Username:</label>
+                        <input type="text" id="username" name="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" class="small-label">Email:</label>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required><br>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="small-label">Password:</label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address" class="small-label">Address:</label>
+                        <input type="text" id="address" name="address" class="form-control" required>
+                    </div>
+                    <button type="submit" class="custom-button">Update your info!</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br>
-    <label for="address">Address:</label>
-    <input type="address" id="address" name="address" required><br>
+<!-- Bootstrap JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
+<script src="static/vendor/jquery/jquery.min.js"></script>
+<script src="static/js/main.js"></script>
 
-    <button type="submit">Update your data!</button>
-</form>
 </body>
+
+<script>
+    // Ascunde eticheta când se tastează în câmpul de intrare
+    const inputFields = document.querySelectorAll('.form-control');
+    inputFields.forEach((input) => {
+        input.addEventListener('input', function () {
+            const label = this.parentNode.querySelector('label');
+            label.style.display = 'none';
+        });
+
+        input.addEventListener('blur', function () {
+            const label = this.parentNode.querySelector('label');
+            if (this.value === '') {
+                label.style.display = 'block';
+            }
+        });
+    });
+</script>
+
 </html>

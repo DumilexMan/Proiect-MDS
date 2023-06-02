@@ -1,0 +1,145 @@
+body {
+    background-image: url("/static/images/v944-bb-16-job598.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center top;
+    text-align: center;
+    font-weight: lighter;
+    font-family: Ubuntu, serif;
+    font-size: 20px;
+
+}
+
+
+
+#casuta_prime{
+    font-weight: lighter;
+    font-family: Ubuntu, serif;
+    font-size: 20px;
+    position: relative;
+    margin: auto;
+    border: 1px solid #3B663B;
+    padding: 20px;
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    background-size: cover;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#nume{
+    border: 1px solid #3B663B;
+    border-radius: 50px;
+    background-color: rgba(128, 148, 136, 0.3);
+}
+
+#rating_cumparator_user{
+    border: 1px solid #3B663B;
+    border-radius: 50px;
+    background-color: rgba(203, 217, 217, 0.3);
+    margin-top: 10px;
+}
+
+#rating_vanzator_user{
+    border: 1px solid #3B663B;
+    border-radius: 50px;
+    background-color: rgba(203, 217, 217, 0.3);
+    margin-top: 10px;
+}
+
+#feedbackv{
+    border: 1px solid #3B663B;
+    border-radius: 50px;
+    background-color: rgba(203, 217, 217, 0.3);
+    margin-top: 10px;
+}
+
+#feedbackc{
+    border: 1px solid #3B663B;
+    border-radius: 50px;
+    background-color: rgba(203, 217, 217, 0.3);
+    margin-top: 10px;
+}
+
+#ratingv{
+    border: 1px solid #3B663B;
+    border-radius: 50px;
+    background-color: rgba(203, 217, 217, 0.3);
+    margin-top: 10px;
+}
+
+#ratingc{
+    border: 1px solid #3B663B;
+    border-radius: 50px;
+    background-color: rgba(203, 217, 217, 0.3);
+    margin-top: 10px;
+}
+
+.navbar {
+            background-color: #E1F3E8;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .navbar li {
+            position: relative;
+            margin-right: 60px;
+        }
+
+        .navbar li:last-child {
+            margin-right: 0;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: #000000;
+            transition: color 0.3s;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 21px;
+        }
+
+        .navbar a:hover {
+            color: #B5E0C7;
+        }
+
+        .navbar .sub-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #E1F3E8;
+            padding: 10px;
+            z-index: 999;
+        }
+
+        .navbar li:hover .sub-menu {
+            display: block;
+        }
+
+        .navbar .sub-menu li {
+            margin-right: 0;
+        }
+
+        .navbar .sub-menu a {
+
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 19px;
+        }
+
+        .navbar .sub-menu a:hover {
+            color: #B5E0C7;
+        }
+
