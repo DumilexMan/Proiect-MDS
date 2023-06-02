@@ -77,7 +77,6 @@ class LoginForm(FlaskForm):
 def load_user(id_user):
     return User.query.get(int(id_user))
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -229,7 +228,7 @@ def create_post():
             db.session.add(post)
             db.session.commit()
 
-            return redirect(url_for('posts_ownded_by_user'))
+            return redirect(url_for('posts'))
     else:
         products = Product.query.filter_by(id_user=current_user.id_user).all()
         return render_template('create_post.html', datetime=datetime, products=products)
