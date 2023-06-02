@@ -18,7 +18,7 @@ body {
 }
 
 .container {
-    border: 1px solid #3B666B;
+    border: 1px solid #3B663B;
     padding: 20px;
     max-width: 900px;
     width: 100%;
@@ -62,4 +62,5 @@ body {
     position: relative;
     max-block-size: 50%;
     max-width: 30%;
+    margin-left: auto;
 }

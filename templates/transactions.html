@@ -6,53 +6,53 @@
 </head>
 
 
-
+<link rel="stylesheet" href="/../static/view_transactions.css">
 <body>
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{% if messages %}
+<ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 {% endwith %}
 
 
+<tbody>
+{% for tranzactie in tranzactii %}
 
-    <tbody>
-            {% for tranzactie in tranzactii %}
+<form action="" method="post">
 
-                <form action="" method="post">
-    <input type="submit" name={{"Feedback"}}{{ tranzactie.id_transaction }} value="Feedback">
+
+<div id="casuta_prime">
+
+    <tr>
+        id tranzactie:
+        <td>{{ tranzactie.id_transaction }}</td>
+        </br>
+        id cumparator:
+        <td>{{ tranzactie.buyer_id }}</td>
+        </br>
+        id vanzator:
+        <td>{{ tranzactie.seller_id }}</td>
+        </br>
+        id produs:
+        <td>{{ tranzactie.product_id }}</td>
+        </br>
+        pret:
+        <td>{{ tranzactie.price }}</td>
+        </br>
+        data:
+        <td>{{ tranzactie.date }}</td>
+        </br>
+        </br>
+        <input type="submit" class="custom-button" name={{"Feedback"}}{{ tranzactie.id_transaction }} value="Feedback">
+    </tr>
+</div>
     </form>
-
-                <tr>
-                    id tranzactie:
-                    <td>{{ tranzactie.id_transaction }}</td>
-                    </br>
-                    id cumparator:
-                    <td>{{ tranzactie.buyer_id }}</td>
-                    </br>
-                    id vanzator:
-                    <td>{{ tranzactie.seller_id }}</td>
-                    </br>
-                    id produs:
-                    <td>{{ tranzactie.product_id }}</td>
-                    </br>
-                    pret:
-                    <td>{{ tranzactie.price }}</td>
-                    </br>
-                    data:
-                    <td>{{ tranzactie.date }}</td>
-                    </br>
-                    </br>
-                    </br>
-                    </br>
-                    </br>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% endfor %}
+</tbody>
+</table>
 </body>
 </html>
