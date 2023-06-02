@@ -1,0 +1,56 @@
+ .container {
+            margin-top: 50px;
+        }
+ .table {
+            margin-top: 50px;
+        }
+
+
+        .card {
+            border: none;
+            border-radius: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        h1 {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+ .btn-primary{
+        background-color: #E1F3E8;
+        border: none;
+        color: #000000;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #B5E0C7;
+    }
+     .form-control{
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
+
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    select{
+        background-color:lightblue ;
+    }
+    input{
+        background-color:lightblue ;
+    }

@@ -1,0 +1,47 @@
+ h1 {
+            color: white;
+        }
+
+        table {
+            background-color: lightcyan;
+            color: black;
+            margin-top: 20px;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        th, td {
+            padding: 5px;
+        }
+        .btn-primary{
+        background-color: #E1F3E8;
+        border: none;
+        color: #000000;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #B5E0C7;
+    }
+     .form-control{
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
+
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    select{
+        background-color:lightblue ;
+    }
+    input{
+        background-color:lightblue ;
+    }

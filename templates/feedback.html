@@ -3,6 +3,21 @@
 <head>
     <title>Feedback</title>
 </head>
+```
+<body>
+<form action="" method="post">
+<label>Text_Feedback</label>
+<textarea name="feedback_text" rows="4" cols="50"></textarea>
+<br>
+<label for="price">Rating</label>
+            <input type="number" class="form-control" id="price" name="rating" min="1" step="1" required>
+    <label>Cumparator</label>
+    <p name="id_cumparator">{{ tranzactie.buyer_id }}</p>
+    <label>Vanzator</label>
+<p name="id_vanzator">{{ tranzactie.seller_id}}</p>
+      <input type="submit" value="Trimite">
+</form>
+```
 <header>
     <div class="navbar">
         <ul>
