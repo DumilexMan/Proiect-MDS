@@ -3,24 +3,24 @@
 {#{% block content %}#}
 
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{% if messages %}
+<ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 {% endwith %}
 
-<h1>Trimite mesaj</h1>
-    <form action=""  method="post">
-        <label>Receiver Username:</label>
-            <input type="message_text" name="receiver_name"><br><br>
-        <label>Message:</label>
-            <textarea name="message_text" rows="5"></textarea><br><br>
-      <input type="submit" value="Trimite">
+<link rel="stylesheet" href="/../static/send_message.css">
+<div id="casuta_prime">
+    <h1>Trimite mesaj</h1>
+    <form action="" method="post">
+        <input type="message_text" name="receiver_name" value="Receiver Username"><br><br>
+        <textarea name="message_text" rows="5"></textarea><br><br>
+        <input type="submit" value="Trimite">
     </form>
-
+</div>
 
 {#{% endblock %}#}
 
