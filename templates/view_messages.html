@@ -1,43 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Messages</title>
-    <style>
-      .message-row {
-        display: flex;
-        /*justify-content: flex-start;*/
-      }
-      .message-row.s {
-        /*justify-content: flex-end;*/
-        margin-right: 100px;
-      }
-      .message {
-        background-color: #f2f2f2;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 5px;
-        max-width: 50%;
-      }
-      .message.s {
-        background-color: #e2f3ff;
-      }
-    </style>
-  </head>
-  <body>
+
+</head>
+<body>
+<link rel="stylesheet" href="/../static/view_messages.css">
+<div class="container">
     <h1>Messages</h1>
     <table>
-      {% for key, value in messages.items() %}
+        {% for key, value in messages.items() %}
         <tr class="message-row {{ value['s/r'] }}">
-          <td>{{ key }}</td>
-          <td>
-            <ul>
-              {% for message in value['messages'] %}
-                <li class="message {{ message['s/r'] }}">{{ message['text'] }}</li>
-              {% endfor %}
-            </ul>
-          </td>
+            <td>{{ key }}</td>
+            <td>
+                <ul>
+                    {% for message in value['messages'] %}
+                    <li class="message {{ message['s/r'] }}">{{ message['text'] }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
         </tr>
-      {% endfor %}
+        {% endfor %}
     </table>
-  </body>
+</div>
+</body>
 </html>
