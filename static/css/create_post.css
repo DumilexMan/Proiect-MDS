@@ -55,6 +55,11 @@ h1 {
             padding: 5px;
             margin-bottom: 10px;
         }
+        .container{
+            position: absolute;
+            top: 15%;
+            left: 10%;
+        }
         .form-control{
             background-color: #E1F3E8;
             border: none;
