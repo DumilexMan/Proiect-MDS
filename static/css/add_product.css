@@ -1,11 +1,12 @@
 .container {
-        background-color: lightblue;
+        background-color: rgba(202, 215, 213, 1);
         color: white;
         padding: 20px;
         border-radius: 5px;
         position: absolute;
         top: 15%;
         left: 10%;
+        margin-left: 10%;
     }
 
     .form-control {
@@ -30,7 +31,7 @@
         background-color: #B5E0C7;
     }
      .form-control{
-            background-color: #E1F3E8;
+            background-color: rgba(255, 255, 255, 0.3);;
             border: none;
             color: #000000;
             padding: 5px 10px;

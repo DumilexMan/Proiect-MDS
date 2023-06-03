@@ -2,7 +2,16 @@
 <html>
 <head>
     <title>Messages</title>
+    <link rel="stylesheet" href="/static/css/view_messages.css">
+    <link rel="stylesheet" href="/static/css/menu.css">
+    <style>
+        .scris {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 40px;
+        }
 
+    </style>
 </head>
 
 <header>
@@ -44,9 +53,9 @@
 </header>
 
 <body>
-<link rel="stylesheet" href="/../static/css/view_messages.css">
+
 <div class="container">
-    <h1>Messages</h1>
+    <h1 class="scris">Messages</h1>
     <table>
         {% for key, value in messages.items() %}
         <tr class="message-row {{ value['s/r'] }}">

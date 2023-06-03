@@ -1,8 +1,8 @@
 body {
     background-image: url("/static/images/v944-bb-16-job598.jpg");
+     background-repeat: no-repeat;
     background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center top;
+    background-attachment: fixed;
     text-align: center;
     font-weight: lighter;
     font-family: Ubuntu, serif;
