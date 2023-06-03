@@ -77,7 +77,6 @@ class LoginForm(FlaskForm):
 def load_user(id_user):
     return User.query.get(int(id_user))
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -229,7 +228,7 @@ def create_post():
             db.session.add(post)
             db.session.commit()
 
-            return redirect(url_for('posts_ownded_by_user'))
+            return redirect(url_for('posts'))
     else:
         products = Product.query.filter_by(id_user=current_user.id_user).all()
         return render_template('create_post.html', datetime=datetime, products=products)
@@ -274,7 +273,11 @@ def posts_filter_by_category():
     products = Product.query.filter_by(category=category).all()
     for product in products:
         posts.append(Post.query.filter_by(id_product=product.id_product).first())
-    return render_template('posts.html', posts=posts, ok=ok)
+    if len(posts) == 0:
+        flash('There are no posts with this category.')
+        return redirect(url_for('posts'))
+    else:
+        return render_template('posts.html', posts=posts, ok=ok)
 
 
 
@@ -285,21 +288,33 @@ def posts_filter_by_price():
     upper_price = request.args.get('upper_price')
 
     posts = Post.query.filter(Post.price >= lower_price, Post.price <= upper_price).all()
-    return render_template('posts.html', posts=posts,ok=ok)
+    if len(posts) == 0:
+        flash('There are no posts with this category.')
+        return redirect(url_for('posts'))
+    else:
+        return render_template('posts.html', posts=posts,ok=ok)
 
 
 @app.route('/posts_filter_descending_by_price')
 def posts_filter_descending_by_price():
     ok=0
     posts = Post.query.order_by(Post.price.desc()).all()
-    return render_template('posts.html', posts=posts,ok=ok)
+    if len(posts) == 0:
+        flash('There are no posts with this category.')
+        return redirect(url_for('posts'))
+    else:
+        return render_template('posts.html', posts=posts,ok=ok)
 
 
 @app.route('/posts_filter_ascending_by_price')
 def posts_filter_ascending_by_price():
     posts = Post.query.order_by(Post.price.asc()).all()
     ok=0
-    return render_template('posts.html', posts=posts,ok=ok)
+    if len(posts) == 0:
+        flash('There are no posts with this category.')
+        return redirect(url_for('posts'))
+    else:
+        return render_template('posts.html', posts=posts,ok=ok)
 
 
 @app.route('/posts_filter_by_date')
@@ -307,7 +322,11 @@ def posts_filter_by_date():
     ok=0
     date = request.args.get('date')
     posts = Post.query.filter(Post.start_date <= date, Post.end_date >= date).all()
-    return render_template('posts.html', posts=posts,ok=ok)
+    if len(posts) == 0:
+        flash('There are no posts with this category.')
+        return redirect(url_for('posts'))
+    else:
+        return render_template('posts.html', posts=posts,ok=ok)
 
 
 @app.route('/posts/<int:post_id>', methods=['POST', 'GET'])
@@ -421,14 +440,22 @@ def auctions_order_by_end_date():
     ok=0
     auctions = Auction.query.order_by(Auction.curent_price.asc()).all()
 
-    return render_template('auctions.html', auctions=auctions,ok=ok)
+    if len(auctions) == 0:
+        flash('There are no auctions.')
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_ordered_descending_by_current_price')
 def auctions_order_by_current_price():
     ok=0
     auctions = Auction.query.order_by(Auction.curent_price.desc()).all()
-    return render_template('auctions.html', auctions=auctions,ok=ok)
+    if len(auctions) == 0:
+        flash('There are no auctions.')
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_filter_by_date')
@@ -436,7 +463,11 @@ def auctions_filter_by_date():
     ok=0
     date=request.args.get('date')
     auctions = Auction.query.filter(Auction.start_date <= date, Auction.end_date >= date).all()
-    return render_template('auctions.html', auctions=auctions,ok=ok)
+    if len(auctions) == 0:
+        flash('There are no auctions.')
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_with_status_open')
@@ -445,8 +476,9 @@ def auctions_with_status_open():
     auctions = Auction.query.filter_by(status='active').all()
     if auctions is None:
         flash('There are no auctions.')
-        return redirect(url_for('index'))
-    return render_template('auctions.html', auctions=auctions,ok=ok)
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_with_status_closed')
@@ -455,8 +487,9 @@ def auctions_with_status_closed():
     auctions = Auction.query.filter_by(status='closed').all()
     if auctions is None:
         flash('There are no auctions.')
-        return redirect(url_for('index'))
-    return render_template('auctions.html', auctions=auctions,ok=ok)
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('auctions.html', auctions=auctions,ok=ok)
 
 
 @app.route('/auctions_with_status_open_with_range_price')
@@ -470,7 +503,11 @@ def auctions_with_status_open_with_current_price_between():
     auctions = Auction.query.filter(Auction.status == 'active',
                                          Auction.curent_price >= price1,
                                          Auction.curent_price <= price2).all()
-    return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2,ok=ok)
+    if len(auctions) == 0:
+        flash('There are no auctions.')
+        return redirect(url_for('auctions'))
+    else:
+        return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2,ok=ok)
 
 
 
@@ -707,10 +744,10 @@ def questions():
                         flash('Raspunsul a fost sters cu succes!', 'success')
                         return redirect(url_for('questions'))
 
-            if (question.id_question,question.question_text,question.id_user,user_intrebare.email) in dict:
-                dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email))
+            if (question.id_question,question.question_text,question.id_user,user_intrebare.username) in dict:
+                dict[(question.id_question,question.question_text,question.id_user,user_intrebare.username)].append((raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.username))
             else:
-                dict[(question.id_question,question.question_text,question.id_user,user_intrebare.email)]=[(raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.email)]
+                dict[(question.id_question,question.question_text,question.id_user,user_intrebare.username)]=[(raspuns.answer_text,raspuns.id_user,raspuns.id_answer,user_raspuns.username)]
     return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
 
 
