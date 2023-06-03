@@ -6,56 +6,7 @@
 </head>
 
 
-```
 
-<body>
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
-
-
-
-        <tbody>
-            {% for tranzactie in tranzactii %}
-
-                <form action="" method="post">
-    <input type="submit" name={{"Feedback"}}{{ tranzactie.id_transaction }} value="Feedback">
-    </form>
-
-                <tr>
-                    id tranzactie:
-                    <td>{{ tranzactie.id_transaction }}</td>
-                    </br>
-                    id cumparator:
-                    <td>{{ tranzactie.buyer_id }}</td>
-                    </br>
-                    id vanzator:
-                    <td>{{ tranzactie.seller_id }}</td>
-                    </br>
-                    id produs:
-                    <td>{{ tranzactie.product_id }}</td>
-                    </br>
-                    pret:
-                    <td>{{ tranzactie.price }}</td>
-                    </br>
-                    data:
-                    <td>{{ tranzactie.date }}</td>
-                    </br>
-                    </br>
-                    </br>
-                    </br>
-                    </br>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-```
 {% with messages = get_flashed_messages() %}
     {% if messages %}
     <ul class="flashes">
@@ -91,18 +42,15 @@
                 </ul>
             </li>
             <li>
-                <a href="/products">Products</a>
-                <ul class="sub-menu">
-                    <li><a href="/add_product">Add Product</a></li>
-                </ul>
+                <a href="/add_product">Add Product</a>
             </li>
             <li><a href="/view_questions">Questions</a></li>
             <li><a href="/messages">Messages</a>
-            <ul class="sub-menu">
-                <li><a href="/send_message">Send Message</a></li>
-                <li><a href="/view_feedbacks">View Feedbacks</a></li>
-                <li><a href="/give_feedback">Give Feedback</a></li>
-            </ul>
+                <ul class="sub-menu">
+                    <li><a href="/send_message">Send Message</a></li>
+                    <li><a href="/view_feedbacks">View Feedbacks</a></li>
+                    <li><a href="/view_transactions">View Transactions</a></li>
+                </ul>
             </li>
         </ul>
     </div>

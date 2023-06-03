@@ -3,21 +3,7 @@
 <head>
     <title>Feedback</title>
 </head>
-```
-<body>
-<form action="" method="post">
-<label>Text_Feedback</label>
-<textarea name="feedback_text" rows="4" cols="50"></textarea>
-<br>
-<label for="price">Rating</label>
-            <input type="number" class="form-control" id="price" name="rating" min="1" step="1" required>
-    <label>Cumparator</label>
-    <p name="id_cumparator">{{ tranzactie.buyer_id }}</p>
-    <label>Vanzator</label>
-<p name="id_vanzator">{{ tranzactie.seller_id}}</p>
-      <input type="submit" value="Trimite">
-</form>
-```
+
 <header>
     <div class="navbar">
         <ul>
@@ -42,22 +28,22 @@
                 </ul>
             </li>
             <li>
-                <a href="/products">Products</a>
-                <ul class="sub-menu">
-                    <li><a href="/add_product">Add Product</a></li>
-                </ul>
+                <a href="/add_product">Add Product</a>
             </li>
             <li><a href="/view_questions">Questions</a></li>
             <li><a href="/messages">Messages</a>
-            <ul class="sub-menu">
-                <li><a href="/send_message">Send Message</a></li>
-                <li><a href="/view_feedbacks">View Feedbacks</a></li>
-                <li><a href="/give_feedback">Give Feedback</a></li>
-            </ul>
+                <ul class="sub-menu">
+                    <li><a href="/send_message">Send Message</a></li>
+                    <li><a href="/view_feedbacks">View Feedbacks</a></li>
+                    <li><a href="/view_transactions">View Transactions</a></li>
+                </ul>
             </li>
         </ul>
     </div>
 </header>
+
+
+
 <body>
 <link rel="stylesheet" href="static/css/give_feedback.css">
 
