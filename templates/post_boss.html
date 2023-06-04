@@ -220,7 +220,7 @@
         <p class="scrismic"><strong>Start Date:</strong> {{ post.start_date }}</p>
         <p class="scrismic"><strong>End Date:</strong> {{ post.end_date }}</p>
         <p class="scrismic"><strong>Seller:</strong> {{ nume }}</p>
-        <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine" class="img-fluid">
+        <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine" class="img-fluid" width="800px">
         {% if user_curent.id_user != 0 %}
         {% if user_curent.id_user == post.id_user and post.status == 'active' %}
         <form method="POST" action="{{ url_for('close_post', id_post=post.id_post) }}">

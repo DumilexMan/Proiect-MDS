@@ -20,7 +20,10 @@ login_manager.login_view = 'login'
 bcrypt = Bcrypt()
 socketio = SocketIO(app)
 
+#bcrypt -hashuit parole
+#loginMananger - autentificare
 
+#pentru imaginea produsului pastrata in binar in bd
 @app.template_filter('b64encode')
 def b64encode_filter(data):
     encoded_bytes = base64.b64encode(data)
@@ -33,7 +36,7 @@ def handle_connection_error(error):
     flash('Email-ul este deja folosit!')
     return redirect(request.referrer or url_for('/register'))
 
-
+#formurale pentru inregistrare si autentificare
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
         InputRequired(), Length(min=4, max=30)], render_kw={"placeholder": "Username"})
@@ -73,16 +76,20 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
+#necesita implementata pentru a putea folosi @login_required din Flask
 @login_manager.user_loader
 def load_user(id_user):
     return User.query.get(int(id_user))
 
+
+# ruta pentru logare
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
+            #verificam ca parola hashuita introdusa este aceeasi cu cea din bd
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('dashboard'))
@@ -94,7 +101,8 @@ def login():
             return redirect(url_for('login', form=form))
     return render_template('login.html', form=form)
 
-
+#decoratorul @login_required solicita utilizatorului sa fie logat pentru a face actiunea respectiva, altfel il va trimite la pagina de logare
+#ruta pentru dashboard
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
@@ -103,14 +111,14 @@ def dashboard():
     auctions = Auction.query.filter_by(id_user=current_user.id_user).all()
     return render_template('dashboard.html', posts=posts, products=products, auctions=auctions)
 
-
+#ruta de logout
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-
+#ruta pentru inregistrare foloseste (la fel ca la login) formuralul de inregistrare de mai sus
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -135,10 +143,13 @@ def register():
     return render_template('register.html', form=form)
 
 
+#functie ajutatoare
 def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
 
 
+#ruta pentru modificare ulterioara a informatiilor userului autentificat
+#se poat schimba intre 0 si toate informatiile contului de o data
 @app.route('/edit_data', methods=['GET', 'POST'])
 @login_required
 def edit_data():
@@ -160,7 +171,7 @@ def edit_data():
     else:
         return render_template('edit_data.html')
 
-
+#verificare produse interzise
 def check_for_drugs(text):
     drug_names = ['marijuana', 'cocaine', 'heroin', 'ecstasy', 'lsd', 'methamphetamine', 'crystal meth', 'pcp',
                   'ketamine']
@@ -169,7 +180,8 @@ def check_for_drugs(text):
             return True
     return False
 
-
+#ruta pentru adaugare de produs in bd
+# primeste 2 tipuri de metode si Post si Get, atunci cand e Get doar randeaza formuralul html, cand e Post adauga produsul
 @app.route('/add_product', methods=['GET', 'POST'])
 @login_required
 def add_product():
@@ -234,6 +246,7 @@ def create_post():
         return render_template('create_post.html', datetime=datetime, products=products)
 
 
+
 @app.route('/products')
 def products():
     products = Product.query.all()
@@ -257,14 +270,14 @@ def posts_ownded_by_user():
         post_list.append(post_dict)
     return jsonify(post_list)
 
-
+#ruta pentru afisarea anunturilor
 @app.route('/posts')
 def posts():
     ok=1
     posts = Post.query.all()
     return render_template('posts.html', posts=posts,ok=ok)
 
-
+#afisari de anunturi filtrate dupa anumite criterii
 @app.route('/posts_filter_by_category')
 def posts_filter_by_category():
     ok = 0
@@ -328,7 +341,7 @@ def posts_filter_by_date():
     else:
         return render_template('posts.html', posts=posts,ok=ok)
 
-
+#afisare unui anunt singular pe o pagina, se afiseaza dupa id pentru a putea fi diferentiat de celelalte anunturi
 @app.route('/posts/<int:post_id>', methods=['POST', 'GET'])
 def get_post(post_id):
     # Get the post with the specified ID from the database
@@ -344,7 +357,7 @@ def get_post(post_id):
                                user_curent=user_curent)
 
 
-
+#ruta pentru cumpararea unui produs de pe un anumit anunt
 @app.route('/posts/<int:id_post>/buy', methods=['POST', 'GET'])
 @login_required
 def buy_product(id_post):
@@ -371,7 +384,7 @@ def buy_product(id_post):
         return redirect(url_for('get_post', post_id=id_post))
 
 
-######Auction######
+#crearea unei licitatii noi
 @app.route('/auctions/create', methods=['GET', 'POST'])
 @login_required
 def create_auction():
@@ -413,7 +426,7 @@ def create_auction():
         products = Product.query.filter_by(id_user=current_user.id_user).all()
         return render_template('create_auction.html', datetime=datetime, products=products)
 
-
+#afisarea tuturor licitatiilor existente
 @app.route('/auctions', methods=['GET', 'POST'])
 def auctions():
     ok=1
@@ -433,7 +446,7 @@ def auctions():
     return render_template('auctions.html', auctions=auctions,ok=ok)
   
   
-  
+#afisarea licitatiilor prin filtrare in functie de anumite criterii
 @app.route('/auctions_ordered_ascending_by_current_price')
 
 def auctions_order_by_end_date():
@@ -510,7 +523,7 @@ def auctions_with_status_open_with_current_price_between():
         return render_template('auctions.html', auctions=auctions, lower_price=price1, upper_price=price2,ok=ok)
 
 
-
+#afisarea/accesarea unui anumite licitatii
 @app.route('/auctions/<int:id_auction>', methods=['GET'])
 def get_auction(id_auction):
     auction = Auction.query.get_or_404(id_auction)
@@ -529,12 +542,13 @@ def get_auction(id_auction):
         return render_template('auction.html', auction=auction, id_auction=id_auction, product=product, nume=nume,
                                user_curent=user_curent)
 
+#crearea unei oferte pentru o licitatia accesata
 @app.route('/auctions/<int:id_auction>/create_bid', methods=['GET'])
 @login_required
 def create_bid(id_auction):
     return render_template('create_bid.html', id_auction=id_auction)
 
-
+#adaugarea unei oferte pentru o licitatia accesata
 @app.route('/auctions/<int:auction_id>/add_bid', methods=['POST', 'GET'])
 @login_required
 def add_bid(auction_id):
@@ -564,7 +578,7 @@ def add_bid(auction_id):
     else:
         return redirect(url_for('add_bid', auction_id=auction_id))
 
-
+#inchiderea fortata a unei licitatii, lucru ce poate fi facut doar de catre detinatorul licitatiei
 @app.route('/auctions/<int:auction_id>/close', methods=['POST', 'GET'])
 @login_required
 def close_auction(auction_id):
@@ -589,6 +603,7 @@ def close_auction(auction_id):
         return redirect(url_for('get_auction', id_auction=auction_id))
 
 
+#redeschiderea fortata a unei licitatii, lucru ce poate fi facut doar de catre detinatorul licitatiei
 @app.route('/auctions/<int:auction_id>/open', methods=['POST', 'GET'])
 @login_required
 def open_auction(auction_id):
@@ -607,6 +622,7 @@ def open_auction(auction_id):
         return redirect(url_for('get_auction', id_auction=auction_id))
 
 
+#redeschiderea fortata a unui anunt, lucru ce poate fi facut doar de catre detinatorul anuntului
 @app.route('/posts/<int:id_post>/open', methods=['POST', 'GET'])
 @login_required
 def open_post(id_post):
@@ -625,6 +641,7 @@ def open_post(id_post):
         return redirect(url_for('get_post', id_post=id_post))
 
 
+#inchiderea fortata a unui anunt, lucru ce poate fi facut doar de catre detinatorul anuntului
 @app.route('/posts/<int:id_post>/close', methods=['POST', 'GET'])
 @login_required
 def close_post(id_post):
@@ -642,7 +659,7 @@ def close_post(id_post):
     else:
         return redirect(url_for('get_post', id_post=id_post))
 
-
+#functie pentru criptarea mesajelor din bd (baza de date)
 def encrypt(text):
     swapped_text = ''
     for i in range(0, len(text), 5):
@@ -655,7 +672,7 @@ def encrypt(text):
 
     return swapped_text
 
-
+#functie pentru decriptarea mesajelor din baza de date
 def decrypt(text):
     original_text = ''
     for i in range(0, len(text), 5):
@@ -673,7 +690,7 @@ def decrypt(text):
 
 
 
-
+#afisarea tuturor intrebarilor
 @app.route('/view_questions',methods=['GET','POST'])
 def questions():
 
@@ -751,7 +768,7 @@ def questions():
     return render_template('view_questions.html',intrebari_raspunsuri=dict,user_curent=current_user)
 
 
-# Functie pentru trimis mesaje
+# ruta pentru trimiterea mesajelor unui utilizator
 @app.route('/send_message', methods=['GET', 'POST'])
 @login_required
 def send_message():
@@ -787,7 +804,7 @@ def send_message():
     else:
         return render_template('send_message.html')
 
-
+#ruta pentru modificarea ulteriaoara a unui anunt de catre vanzator
 @app.route('/posts/<int:id_post>/update', methods=['POST', 'GET', 'PUT'])
 @login_required
 def update_post(id_post):
@@ -813,6 +830,7 @@ def update_post(id_post):
         return render_template('update_post.html', post=post, product=product)
 
 
+#ruta pentru modificarea ulteriaoara a unei licitatii de catre vanzator
 @app.route('/auctions/<int:id_auction>/update', methods=['POST', 'GET', 'PUT'])
 @login_required
 def update_auction(id_auction):
@@ -889,6 +907,7 @@ def messages():
     return render_template('view_messages.html', messages=sorted_dict)
 
 
+#ruta pentru trimiterea mesajelor de catre posibilul cumparator(userul logat) catre detinatorul anuntului, direct din anunt
 @app.route('/send_message_post', methods=['GET', 'POST'])
 @login_required
 def send_message_post():
@@ -926,7 +945,8 @@ def send_message_post():
         nume = request.args.get('nume')
         return render_template('send_message_post.html', nume=nume)
       
-      
+
+#ruta pentru vizualizarea tranzactiilor efectuate atat ca si cumparator cat si ca vanzator
 @app.route('/view_transactions', methods=['GET', 'POST'])
 @login_required
 def view_transactions():
@@ -945,7 +965,7 @@ def view_transactions():
 
     return render_template('transactions.html', tranzactii=transactions, user_curent=current_user)
 
-
+#ruta pentru acordarea de feedback de cumparator/vanzator utilizatorului cu care userul logat a incheiat o tranzactie
 @app.route('/give_feedback', methods=['GET', 'POST'])
 @login_required
 def give_feedback():
@@ -1010,7 +1030,7 @@ def give_feedback():
 
         return render_template('feedback.html', tranzactie=tranzactie, user_curent=user_curent, vanzator=vanzator, cumparator=cumparator)
 
-
+#ruta pentru vizualizarea feedback-ului de vanzator/cumparator
 @app.route('/view_feedbacks', methods=['GET', 'POST'])
 def view_feedback():
     feedbacks = Feedback.query.all()
@@ -1040,7 +1060,7 @@ def view_feedback():
 
 
 
-
+#acasa
 @app.route('/')
 def home():
     return render_template("index.html")

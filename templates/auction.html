@@ -47,42 +47,53 @@
 </header>
 <style>
     body {
-       background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
-      background-size: cover;
+        background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
     }
-    select{
-        background-color:lightblue ;
-    }
-     .form-control{
-            background-color: #E1F3E8;
-            border: none;
-            color: #000000;
-            padding: 5px 10px;
 
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-    input{
-        background-color:lightblue ;
+    select {
+        background-color: lightblue;
     }
-      .container {
+
+    .form-control {
+        background-color: #E1F3E8;
+        border: none;
+        color: #000000;
+        padding: 5px 10px;
+
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    input {
+        background-color: lightblue;
+    }
+
+    .container {
         background-color: white;
         color: black;
         padding: 20px;
         border-radius: 5px;
         position: absolute;
-          top:15%;
-          left:10%;
+        top: 15%;
+        left: 10%;
+        height: 80%;
+        margin-left: 18%;
+        width: 800px;
+        background-color: rgba(255, 255, 255, 0.6);
+        overflow-y: scroll;
 
     }
 
     h1, p {
-        color:black;
+        color: black;
     }
 
-    .btn-primary{
+    .btn-primary {
         background-color: #E1F3E8;
         border: none;
         color: #000000;
@@ -97,72 +108,92 @@
     .btn-primary:hover {
         background-color: #B5E0C7;
     }
-       .navbar {
-            background-color: #E1F3E8;
-            display: flex;
-            justify-content: center;
-            padding: 10px;
-        }
 
-        .navbar ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
+    .navbar {
+        background-color: #E1F3E8;
+        display: flex;
+        justify-content: center;
+        padding: 10px;
+    }
 
-        .navbar li {
-            position: relative;
-            margin-right: 60px;
-        }
+    .navbar ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
 
-        .navbar li:last-child {
-            margin-right: 0;
-        }
+    .navbar li {
+        position: relative;
+        margin-right: 60px;
+    }
 
-        .navbar a {
-            text-decoration: none;
-            color: #000000;
-            transition: color 0.3s;
-            font-weight: lighter;
-            font-family: Ubuntu;
-            font-size: 21px;
-        }
+    .navbar li:last-child {
+        margin-right: 0;
+    }
 
-        .navbar a:hover {
-            color: #B5E0C7;
-        }
+    .navbar a {
+        text-decoration: none;
+        color: #000000;
+        transition: color 0.3s;
+        font-weight: lighter;
+        font-family: Ubuntu;
+        font-size: 21px;
+    }
 
-        .navbar .sub-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #E1F3E8;
-            padding: 10px;
-            z-index: 999;
-        }
+    .navbar a:hover {
+        color: #B5E0C7;
+    }
 
-        .navbar li:hover .sub-menu {
-            display: block;
-        }
+    .navbar .sub-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #E1F3E8;
+        padding: 10px;
+        z-index: 999;
+    }
 
-        .navbar .sub-menu li {
-            margin-right: 0;
-        }
+    .navbar li:hover .sub-menu {
+        display: block;
+    }
 
-        .navbar .sub-menu a {
+    .navbar .sub-menu li {
+        margin-right: 0;
+    }
 
-            font-weight: lighter;
-            font-family: Ubuntu;
-            font-size: 19px;
-        }
+    .navbar .sub-menu a {
 
-        .navbar .sub-menu a:hover {
-            color: #B5E0C7;
-        }
+        font-weight: lighter;
+        font-family: Ubuntu;
+        font-size: 19px;
+    }
 
+    .navbar .sub-menu a:hover {
+        color: #B5E0C7;
+    }
 
+    .scris {
+        font-weight: lighter;
+        font-family: Ubuntu;
+        font-size: 40px;
+        color: black;
+    }
+
+    .scrismic {
+        font-weight: lighter;
+        font-family: Ubuntu;
+        font-size: 20px;
+        color: black;
+    }
+
+    .scrismicmic {
+        font-weight: lighter;
+        font-family: Ubuntu;
+        font-size: 17px;
+        color: black;
+    }
 </style>
 <body>
 <div class="container">
@@ -175,12 +206,12 @@
     </ul>
     {% endif %}
     {% endwith %}
-    <h1>{{ auction.title }}</h1>
-    <p>Description: {{ auction.description }}</p>
-    <p>Starting Bid: {{ auction.starting_price}}</p>
-    <p>Current Bid: {{ auction.curent_price }}</p>
-    <p>Status: {{ auction.status }}</p>
-    <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine">
+    <h1 class="scris">{{ auction.title }}</h1>
+    <p class="scrismic">Description: {{ auction.description }}</p>
+    <p class="scrismic">Starting Bid: {{ auction.starting_price}}</p>
+    <p class="scrismic">Current Bid: {{ auction.curent_price }}</p>
+    <p class="scrismic">Status: {{ auction.status }}</p>
+    <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine" width="600" height="400">
     {% if user_curent.id_user != 0 and user_curent.id_user==auction.id_user %}
     <form method="POST" action="{{ url_for('close_auction', auction_id=auction.id_auction) }}">
         <button type="submit" class="btn-primary">Close Auction</button>
@@ -198,7 +229,7 @@
     {% endif %}
     {% if user_curent.id_user != auction.id_user %}
     <form method="GET" action="{{ url_for('create_bid', id_auction=auction.id_auction) }}">
-        <button type="submit" class="btn-primary">Add Bid</button>
+        <button type="submit" class="btn-primary scrismicmic">Add Bid</button>
     </form>
     {% endif %}
     <script>
@@ -208,7 +239,8 @@
         }
     </script>
     {% if user_curent.id_user != auction.id_user %}
-    <button onclick="sendMessage('{{ nume }}')" class="btn-primary">Trimiteți un mesaj către proprietar</button>
+    <button onclick="sendMessage('{{ nume }}')" class="btn-primary scrismicmic">Trimiteți un mesaj către proprietar
+    </button>
     {% endif %}
 </div>
 
