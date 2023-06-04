@@ -7,7 +7,9 @@
     <style>
         body {
             background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+            background-repeat: no-repeat;
             background-size: cover;
+            background-attachment: fixed;
         }
 
         h1 {
@@ -134,7 +136,9 @@
         .navbar .sub-menu a:hover {
             color: #B5E0C7;
         }
-
+        .scris{
+            color:black;
+        }
 
     </style>
 </head>
@@ -187,7 +191,7 @@
     {% endif %}
     {% endwith %}
     <div class="container">
-        <h1>Adauga o oferta</h1>
+        <h1 class="scris">Adauga o oferta</h1>
         <form action="{{ url_for('add_bid', auction_id=id_auction) }}" method="POST">
             <div class="form-group">
                 <label for="price">Preț oferit:</label>

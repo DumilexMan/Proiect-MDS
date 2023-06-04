@@ -34,7 +34,7 @@ class User(UserMixin, db.Model):
     def update_last_active(self):
         self.last_active = datetime.now()
         db.session.commit()
-
+    #functiile acestea necesita implementeate pentru a putea folosi functionalitatea de @login_required de la flask
     def is_authenticated(self):
         if self.last_active is not None and datetime.utcnow() - self.last_active <= timedelta(hours=1):
             return True
