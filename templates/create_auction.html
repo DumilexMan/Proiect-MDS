@@ -9,16 +9,20 @@
     <style>
         body {
             background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+            background-repeat: no-repeat;
             background-size: cover;
+            background-attachment: fixed;
         }
-         h1 {
+
+        h1 {
             color: dodgerblue;
         }
-         .container{
-             position: absolute;
-             top:15%;
-             left:10%;
-         }
+
+        .container {
+            position: absolute;
+            top: 15%;
+            left: 10%;
+        }
 
         .flashes {
             list-style: none;
@@ -45,7 +49,8 @@
             padding: 5px;
             margin-bottom: 10px;
         }
-         .form-control{
+
+        .form-control {
             background-color: #E1F3E8;
             border: none;
             color: #000000;
@@ -57,29 +62,32 @@
             transition: background-color 0.3s;
         }
 
- .btn-primary{
-        background-color: #E1F3E8;
-        border: none;
-        color: #000000;
-        padding: 5px 10px;
+        .btn-primary {
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
 
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
 
-    }
- select{
-        background-color:lightblue ;
-    }
-    input{
-        background-color:lightblue ;
-    }
+        }
 
-    .btn-primary:hover {
-        background-color: #B5E0C7;
-    }
-       .navbar {
+        select {
+            background-color: lightblue;
+        }
+
+        input {
+            background-color: lightblue;
+        }
+
+        .btn-primary:hover {
+            background-color: #B5E0C7;
+        }
+
+        .navbar {
             background-color: #E1F3E8;
             display: flex;
             justify-content: center;
@@ -144,7 +152,40 @@
             color: #B5E0C7;
         }
 
+        .scris {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 40px;
+            color: black;
+        }
 
+        .scrismic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 20px;
+            color: black;
+        }
+
+        .scrismicmic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            color: black;
+        }
+
+        .custom-button {
+            background-color: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 2em;
+        }
 
 
     </style>
@@ -188,52 +229,52 @@
     </div>
 </header>
 <body>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flashes">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    <div class="container">
-        <h1>Creează o licitație nouă</h1>
-        <form action="{{ url_for('create_auction') }}" method="POST">
-            <div class="form-group">
-                <label for="title">Titlu:</label>
-                <input type="text" name="title" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="starting_price">Preț de pornire:</label>
-                <input type="number" name="starting_price" step="0.01" min="0" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Descriere:</label>
-                <input type="text" name="description" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="start_date">Data și ora de început:</label>
-                <input type="datetime-local" name="start_date" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="end_date">Data și ora de încheiere:</label>
-                <input type="datetime-local" name="end_date" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="product">Product:</label>
-                <select id="product" name="product" class="form-control" required>
-                    {% for product in products %}
-                    <option value="{{ product.id_product }}">{{ product.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn-primary">Creează licitație</button>
-        </form>
-    </div>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<div class="container">
+    <h1 class="scris">Add an auction</h1>
+    <form action="{{ url_for('create_auction') }}" method="POST">
+        <div class="form-group">
+            <label for="title" class="scrismic">Title:</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="starting_price" class="scrismic">Starting price:</label>
+            <input type="number" name="starting_price" step="0.01" min="0" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="description" class="scrismic">Description:</label>
+            <input type="text" name="description" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="start_date" class="scrismic">Start time:</label>
+            <input type="datetime-local" name="start_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="end_date" class="scrismic">End time:</label>
+            <input type="datetime-local" name="end_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="product" class="scrismic">Product:</label>
+            <select id="product" name="product" class="form-control" required>
+                {% for product in products %}
+                <option value="{{ product.id_product }}">{{ product.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn-primary scrismicmic">Add auction</button>
+    </form>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </body>
 </html>

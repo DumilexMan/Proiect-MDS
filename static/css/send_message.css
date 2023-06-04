@@ -1,8 +1,8 @@
 body{
     background-image: url("/static/images/v944-bb-16-job598.jpg");
-    background-size: cover;
     background-repeat: no-repeat;
-    background-position: center top;
+    background-size: cover;
+    background-attachment: fixed;
 
 }
 

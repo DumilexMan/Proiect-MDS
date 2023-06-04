@@ -9,7 +9,45 @@
     <style>
         body {
             background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
-      background-size: cover;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .background {
+            background-color: #E1F3E8;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            color: black;
+        }
+        .background2 {
+            background-color: #E1F3E8;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 13px;
+            color: black;
+        }
+
+        .scris {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 40px;
+            color: black;
+        }
+
+        .scrismic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 20px;
+            color: black;
+        }
+
+        .scrismicmic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            color: black;
         }
     </style>
 </head>
@@ -53,97 +91,97 @@
 </header>
 <script src="static/js/auctions.js"></script>
 <body>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flashes">
-        {% for message in messages %}
-        <li>{{ message }}</li>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<div class="container">
+    <h1 class="scris">Listă licitații</h1>
+    <table class="table background">
+        <thead>
+        <tr>
+            <th>ID auction</th>
+            <th>ID user</th>
+            <th>Starting price</th>
+            <th>Current price</th>
+            <th>Start time</th>
+            <th>End time</th>
+            <th>ID product</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for auction in auctions %}
+        <tr>
+            <td>{{ auction.id_auction }}</td>
+            <td>{{ auction.id_user }}</td>
+            <td>{{ auction.starting_price }}</td>
+            <td>{{ auction.curent_price }}</td>
+            <td>{{ auction.start_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+            <td>{{ auction.end_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+            <td>{{ auction.id_product }}</td>
+            <td>
+                <form method="GET" action="{{ url_for('get_auction', id_auction=auction.id_auction) }}">
+                    <button type="submit" class="btn-primary">Acces auction</button>
+                </form>
+                <form action="" method="post">
+                    <input type="hidden" name="auction_id" value="{{ auction.id_auction }}">
+                    <button type="submit" class="btn-primary">Delete</button>
+                </form>
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    <div class="container">
-        <h1>Listă licitații</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID licitație</th>
-                    <th>ID utilizator</th>
-                    <th>Preț de pornire</th>
-                    <th>Preț curent</th>
-                    <th>Data și ora de început</th>
-                    <th>Data și ora de încheiere</th>
-                    <th>ID produs</th>
-                    <th>Acțiuni</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for auction in auctions %}
-                <tr>
-                    <td>{{ auction.id_auction }}</td>
-                    <td>{{ auction.id_user }}</td>
-                    <td>{{ auction.starting_price }}</td>
-                    <td>{{ auction.curent_price }}</td>
-                    <td>{{ auction.start_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
-                    <td>{{ auction.end_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
-                    <td>{{ auction.id_product }}</td>
-                    <td>
-                        <form method="GET" action="{{ url_for('get_auction', id_auction=auction.id_auction) }}">
-                            <button type="submit" class="btn-primary">Acces auction</button>
-                        </form>
-                        <form action="" method="post">
-                            <input type="hidden" name="auction_id" value="{{ auction.id_auction }}">
-                            <button type="submit" class="btn-primary">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% if ok != 0 %}
-        <div class="filter-section">
-            <label for="option">Produse în funcție de preț:</label>
-            <select id="pret_function" name="optiune">
-                <option value="crescator">Crescător</option>
-                <option value="descrescator">Descrescător</option>
-            </select>
-            <button onclick="filtreaza_pret()" class="btn-primary">Sortează</button>
+        </tbody>
+    </table>
+    {% if ok != 0 %}
+    <div class="filter-section">
+        <label for="option">Price:</label>
+        <select id="pret_function" name="optiune" class="background">
+            <option value="crescator">Crescător</option>
+            <option value="descrescator">Descrescător</option>
+        </select>
+        <button onclick="filtreaza_pret()" class="btn-primary">Sort</button>
 
-            <br>
+        <br>
 
-            <label for="option">Produse în funcție de status:</label>
-            <select id="status" name="status">
-                <option value="closed">Closed</option>
-                <option value="open">Open</option>
-            </select>
-            <button onclick="filtreaza_status()" class="btn-primary">Filtrează</button>
+        <label for="option">Status:</label>
+        <select id="status" name="status" class="background">
+            <option value="closed">Closed</option>
+            <option value="open">Open</option>
+        </select>
+        <button onclick="filtreaza_status()" class="btn-primary">Filter</button>
 
-            <br>
+        <br>
 
-            <form action="/auctions_filter_by_date" method="get">
-                <input type="date" name="date" required>
-                <button type="submit" class="btn-primary">Filter</button>
-            </form>
+        <form action="/auctions_filter_by_date" method="get">
+            <input type="date" name="date" required class="background">
+            <button type="submit" class="btn-primary">Filter</button>
+        </form>
 
-            <form action="/auctions_with_status_open_with_range_price" method="get">
-                <label for="lower_price">Lower Price:</label>
-                <input type="number" name="lower_price" required>
+        <form action="/auctions_with_status_open_with_range_price" method="get">
+            <label for="lower_price">Lower Price:</label>
+            <input type="number" name="lower_price" required class="background2">
 
-                <label for="upper_price">Upper Price:</label>
-                <input type="number" name="upper_price" required>
+            <label for="upper_price">Upper Price:</label>
+            <input type="number" name="upper_price" required class="background2">
 
-                <button type="submit" class="btn-primary">Filter</button>
-            </form>
-        </div>
-        {% endif %}
-
-        {% if ok != 1 %}
-        <button onclick="refresh()" class="btn-primary">Refresh</button>
-        {% endif %}
+            <button type="submit" class="btn-primary">Filter</button>
+        </form>
     </div>
+    {% endif %}
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    {% if ok != 1 %}
+    <button onclick="refresh()" class="btn-primary">Refresh</button>
+    {% endif %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </body>
 </html>

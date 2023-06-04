@@ -9,7 +9,37 @@
     <style>
         body {
             background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+            background-repeat: no-repeat;
             background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .scris {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 40px;
+            color: black;
+        }
+
+        .scrismic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 20px;
+            color: black;
+        }
+
+        .scrismicmic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            color: black;
+        }
+        .background{
+            background-color: #E1F3E8;
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            color: black;
         }
     </style>
 </head>
@@ -53,96 +83,96 @@
 </header>
 <script src="static/js/auctions.js"></script>
 <body>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flashes">
-        {% for message in messages %}
-        <li>{{ message }}</li>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<div class="container">
+    <h1 class="scris">All Posts</h1>
+    <table class="table table-striped background">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in posts %}
+        <tr>
+            <td>{{ post.title }}</td>
+            <td>{{ post.description }}</td>
+            <td>{{ post.price }}</td>
+            <td>{{ post.status }}</td>
+            <td>
+                <a href="{{ url_for('get_post', post_id=post.id_post) }}" class="btn-primary">Access post</a>
+            </td>
+        </tr>
         {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    <div class="container">
-        <h1>All Posts</h1>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in posts %}
-                <tr>
-                    <td>{{ post.title }}</td>
-                    <td>{{ post.description }}</td>
-                    <td>{{ post.price }}</td>
-                    <td>{{ post.status }}</td>
-                    <td>
-                        <a href="{{ url_for('get_post', post_id=post.id_post) }}" class="btn-primary">Access post</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% if ok != 0 %}
-        <div class="filter-section">
-            <form action="/posts_filter_by_price" method="get">
-                <div class="form-row">
-                    <div class="col">
-                        <label for="lower_price">Lower Price:</label>
-                        <input type="number" name="lower_price" class="form-control" required>
-                    </div>
-                    <div class="col">
-                        <label for="upper_price">Upper Price:</label>
-                        <input type="number" name="upper_price" class="form-control" required>
-                    </div>
-                    <div class="col">
-                        <button type="submit" class="btn-primary">Filter</button>
-                    </div>
+        </tbody>
+    </table>
+    {% if ok != 0 %}
+    <div class="filter-section">
+        <form action="/posts_filter_by_price" method="get">
+            <div class="form-row">
+                <div class="col">
+                    <label for="lower_price" class="scrismic">Lower Price:</label>
+                    <input type="number" name="lower_price" class="form-control" required>
                 </div>
-            </form>
+                <div class="col">
+                    <label for="upper_price" class="scrismic">Upper Price:</label>
+                    <input type="number" name="upper_price" class="form-control" required>
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn-primary">Filter</button>
+                </div>
+            </div>
+        </form>
 
-            <form action="/posts_filter_by_category" method="get">
-                <div class="form-group">
-                    <label for="category">Produse in functie de categorie:</label>
-                    <select id="category" name="category" class="form-control">
-                        <option value="electronice">Electronice</option>
-                        <option value="imbracaminte">Imbracaminte</option>
-                        <option value="jucarii">Jucarii</option>
-                        <option value="carti">Carti</option>
-                        <option value="altele">Altele</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary">Sorteaza</button>
-            </form>
-            <label for="option">Produse în funcție de preț:</label>
-            <select id="pret_function" name="optiune">
-                <option value="crescator">Crescător</option>
-                <option value="descrescator">Descrescător</option>
-            </select>
-            <button onclick="filtreaza_pret()" class="btn-primary">Sortează</button>
+        <form action="/posts_filter_by_category" method="get">
+            <div class="form-group">
+                <label for="category" class="scrismic">Category:</label>
+                <select id="category" name="category" class="form-control">
+                    <option value="electronice">Electronice</option>
+                    <option value="imbracaminte">Imbracaminte</option>
+                    <option value="jucarii">Jucarii</option>
+                    <option value="carti">Carti</option>
+                    <option value="altele">Altele</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">Sorteaza</button>
+        </form>
+        <label for="option" class="scrismic">Price:</label>
+        <select id="pret_function" name="optiune" class="background">
+            <option value="crescator">Crescător</option>
+            <option value="descrescator">Descrescător</option>
+        </select>
+        <button onclick="filtreaza_pret()" class="btn-primary">Sortează</button>
 
-            <form action="/posts_filter_by_date" method="get">
-                <div class="form-group">
-                    <label for="date">Filter by Date:</label>
-                    <input type="date" name="date" class="form-control" required>
-                </div>
-                <button type="submit" class="btn-primary">Filter</button>
-            </form>
-        </div>
-        {% endif %}
-        {% if ok != 1 %}
-        <button onclick="refresh()" class="btn-primary">Refresh</button>
-        {% endif %}
+        <form action="/posts_filter_by_date" method="get">
+            <div class="form-group">
+                <label for="date" class="scrismic">Filter by Date:</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+            <button type="submit" class="btn-primary">Filter</button>
+        </form>
     </div>
+    {% endif %}
+    {% if ok != 1 %}
+    <button onclick="refresh()" class="btn-primary">Refresh</button>
+    {% endif %}
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="static/js/posts.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script src="static/js/posts.js"></script>
 </body>
 </html>

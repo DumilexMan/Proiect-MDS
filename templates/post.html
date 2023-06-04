@@ -10,7 +10,9 @@
     <style>
         body {
             background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+            background-repeat: no-repeat;
             background-size: cover;
+            background-attachment: fixed;
         }
     </style>
 </head>
@@ -53,59 +55,59 @@
     </div>
 </header>
 <body>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class="flashes">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
-                <h1 class="text-center">{{ post.title }}</h1>
-            </div>
-            <div class="card-body">
-                <p><strong>Category:</strong> {{ product.category }}</p>
-                <p><strong>Description:</strong> {{ post.description }}</p>
-                <p><strong>Price:</strong> {{ post.price }}</p>
-                <p><strong>Status:</strong> {{ post.status }}</p>
-                <p><strong>Start Date:</strong> {{ post.start_date }}</p>
-                <p><strong>End Date:</strong> {{ post.end_date }}</p>
-                <p><strong>Seller:</strong> {{ nume }}</p>
-                <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine" class="img-fluid">
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="text-center">{{ post.title }}</h1>
+        </div>
+        <div class="card-body">
+            <p><strong>Category:</strong> {{ product.category }}</p>
+            <p><strong>Description:</strong> {{ post.description }}</p>
+            <p><strong>Price:</strong> {{ post.price }}</p>
+            <p><strong>Status:</strong> {{ post.status }}</p>
+            <p><strong>Start Date:</strong> {{ post.start_date }}</p>
+            <p><strong>End Date:</strong> {{ post.end_date }}</p>
+            <p><strong>Seller:</strong> {{ nume }}</p>
+            <img src="data:image/jpeg;base64,{{ product.image_data|b64encode }}" alt="Imagine" class="img-fluid">
 
-                {% if user_curent.id_user != 0 %}
-                <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
-                    <button type="submit" class="btn-primary">Buy</button>
+            {% if user_curent.id_user != 0 %}
+            <form action="{{ url_for('buy_product', id_post=post.id_post) }}" method="post">
+                <button type="submit" class="btn-primary">Buy</button>
+            </form>
+
+            <button onclick="sendMessage('{{ nume }}')" class="btn-primary">Send Message to Owner</button>
+
+            <div id="message-modal" style="display: none;">
+                <form onsubmit="sendMessage(); return false;">
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" name="message" rows="4" cols="50" class="form-control"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Send</button>
                 </form>
-
-                <button onclick="sendMessage('{{ nume }}')" class="btn-primary">Send Message to Owner</button>
-
-                <div id="message-modal" style="display: none;">
-                    <form onsubmit="sendMessage(); return false;">
-                        <div class="form-group">
-                            <label for="message">Message:</label>
-                            <textarea id="message" name="message" rows="4" cols="50" class="form-control"></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary">Send</button>
-                    </form>
-                </div>
-                {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script>
-        function sendMessage(nume) {
-            var url = '/send_message_post?nume=' + encodeURIComponent(nume);
-            window.location.href = url;
-        }
-    </script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script>
+    function sendMessage(nume) {
+        var url = '/send_message_post?nume=' + encodeURIComponent(nume);
+        window.location.href = url;
+    }
+</script>
 </body>
 </html>

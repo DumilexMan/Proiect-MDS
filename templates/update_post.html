@@ -8,13 +8,15 @@
     <style>
         body {
             background-image: url("{{ url_for('static', filename='Images/Background.jpg') }}");
+            background-repeat: no-repeat;
             background-size: cover;
+            background-attachment: fixed;
         }
 
         .container {
-            background-color: lightblue ;
             margin-top: 50px;
             max-width: 600px;
+            background-color: rgba(132, 150, 138, 0.3);
         }
 
         h1 {
@@ -28,22 +30,24 @@
         textarea {
             resize: vertical;
         }
-         .btn-primary{
-        background-color: #E1F3E8;
-        border: none;
-        color: #000000;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
 
-    .btn-primary:hover {
-        background-color: #B5E0C7;
-    }
-     .form-control{
+        .btn-primary {
+            background-color: #E1F3E8;
+            border: none;
+            color: #000000;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #B5E0C7;
+        }
+
+        .form-control {
             background-color: #E1F3E8;
             border: none;
             color: #000000;
@@ -54,6 +58,7 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         .navbar {
             background-color: #E1F3E8;
             display: flex;
@@ -118,7 +123,26 @@
         .navbar .sub-menu a:hover {
             color: #B5E0C7;
         }
+          .scris {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 40px;
+            color: black;
+        }
 
+        .scrismic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 20px;
+            color: black;
+        }
+
+        .scrismicmic {
+            font-weight: lighter;
+            font-family: Ubuntu;
+            font-size: 17px;
+            color: black;
+        }
 
 
     </style>
@@ -162,32 +186,33 @@
     </div>
 </header>
 <body>
-    <div class="container">
-        <h1>Update Post</h1>
-        <form method="POST" action="{{ url_for('update_post', id_post=post.id_post) }}">
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" class="form-control" value="{{ post.title }}" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" rows="4" cols="50" class="form-control" required>{{ post.description }}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="number" id="price" name="price" class="form-control" value="{{ post.price }}" required>
-            </div>
-            <div class="form-group">
-                <label for="category">Category:</label>
-                <input type="text" id="category" name="category" class="form-control" value="{{ product.category }}" required>
-            </div>
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <input type="text" id="status" name="status" class="form-control" value="{{ post.status }}" required>
-            </div>
-            <button type="submit" class="btn-primary">Update</button>
-        </form>
-    </div>
+<div class="container">
+    <h1 class="scris">Update Post</h1>
+    <form method="POST" action="{{ url_for('update_post', id_post=post.id_post) }}">
+        <div class="form-group">
+            <label for="title" class="scrismic">Title:</label>
+            <input type="text" id="title" name="title" class="form-control" value="{{ post.title }}" required>
+        </div>
+        <div class="form-group">
+            <label for="description" class="scrismic">Description:</label>
+            <textarea id="description" name="description" rows="4" cols="50" class="form-control" required>{{ post.description }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="price" class="scrismic">Price:</label>
+            <input type="number" id="price" name="price" class="form-control" value="{{ post.price }}" required>
+        </div>
+        <div class="form-group">
+            <label for="category" class="scrismic">Category:</label>
+            <input type="text" id="category" name="category" class="form-control" value="{{ product.category }}"
+                   required>
+        </div>
+        <div class="form-group">
+            <label for="status" class="scrismic">Status:</label>
+            <input type="text" id="status" name="status" class="form-control" value="{{ post.status }}" required>
+        </div>
+        <button type="submit" class="btn-primary scrismicmic">Update</button>
+    </form>
+</div>
 </body>
 </html>
 
