@@ -191,13 +191,13 @@
     {% endif %}
     {% endwith %}
     <div class="container">
-        <h1 class="scris">Adauga o oferta</h1>
+        <h1 class="scris">Add your bid</h1>
         <form action="{{ url_for('add_bid', auction_id=id_auction) }}" method="POST">
             <div class="form-group">
-                <label for="price">Preț oferit:</label>
+                <label for="price">Price offered:</label>
                 <input type="number" name="price" step="0.01" min="0" class="form-control" required>
             </div>
-            <button type="submit" class="btn-primary">Adauga oferta</button>
+            <button type="submit" class="btn-primary">Add bid</button>
         </form>
     </div>
 
